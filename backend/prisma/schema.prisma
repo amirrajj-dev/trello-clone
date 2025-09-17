@@ -13,7 +13,7 @@ model User {
   password       String
   name           String
   avatarUrl      String?
-  imagePublicId  String          // Cloudinary public ID
+  imagePublicId  String?          // Cloudinary public ID
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
