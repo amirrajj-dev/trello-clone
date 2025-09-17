@@ -45,6 +45,7 @@ next-env.d.ts
 dist
 /node_modules
 /build
+/generated/prisma
 
 # Logs
 logs
