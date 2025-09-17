@@ -42,7 +42,7 @@ yarn-error.log*
 next-env.d.ts
 
 # compiled output
-/dist
+dist
 /node_modules
 /build
 
