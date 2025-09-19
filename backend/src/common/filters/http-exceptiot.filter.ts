@@ -27,6 +27,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     response.status(statusCode).json({
       status: statusCode,
+      success: statusCode >= 200 && statusCode < 300,
       message,
       path: request.url,
       timestamp: new Date().toISOString(),
