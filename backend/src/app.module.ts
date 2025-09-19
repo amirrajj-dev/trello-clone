@@ -21,7 +21,10 @@ import { LoggerModule } from './common/logger/logger.module';
         JWT_SECRET: Joi.string().required(),
         NODE_ENV: Joi.string().required().valid('development', 'production'),
         SALT: Joi.number().required().default(10),
-        ALLOWED_EMAIL_DOMAINS : Joi.string().required().default('gmail.com')
+        ALLOWED_EMAIL_DOMAINS: Joi.string().required().default('gmail.com'),
+        CLOUDINARY_CLOUD_NAME: Joi.string().required(),
+        CLOUDINARY_API_KEY: Joi.string().required(),
+        CLOUDINARY_API_SECRET: Joi.string().required(),
       }),
     }),
     PrismaModule,
