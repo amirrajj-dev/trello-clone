@@ -8,43 +8,46 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(cuid())
-  email          String          @unique
-  password       String
-  name           String
-  avatarUrl      String?
-  imagePublicId  String?          // Cloudinary public ID
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password      String
+  name          String
+  avatarUrl     String?
+  imagePublicId String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  projects       ProjectMember[] @relation("UserProjectMembers")
-  tasks          Task[]          @relation("AssignedTasks")
-  comments       Comment[]
+  projects      ProjectMember[] @relation("UserProjectMembers")
+  ownedProjects Project[]       @relation("OwnedProjects")
+  tasks         Task[]          @relation("AssignedTasks")
+  comments      Comment[]
 
   @@map("users")
 }
 
 model Project {
-  id          String          @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
   description String?
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  members     ProjectMember[] @relation("ProjectMembers")
-  tasks       Task[]
+  ownerId String
+  owner   User            @relation("OwnedProjects", fields: [ownerId], references: [id], onDelete: Cascade)
+  members ProjectMember[] @relation("ProjectMembers")
+  tasks   Task[]
 
   @@map("projects")
 }
 
 model ProjectMember {
-  id        String   @id @default(cuid())
-  role      Role     @default(MEMBER)
+  id        String @id @default(cuid())
+  role      Role   @default(MEMBER)
   userId    String
   projectId String
 
-  user      User     @relation("UserProjectMembers", fields: [userId], references: [id], onDelete: Cascade)
-  project   Project  @relation("ProjectMembers", fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation("UserProjectMembers", fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation("ProjectMembers", fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([userId, projectId])
   @@map("project_members")
@@ -60,12 +63,12 @@ model Task {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
-  projectId   String
-  assigneeId  String?
+  projectId  String
+  assigneeId String?
 
-  project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  assignee    User?      @relation("AssignedTasks", fields: [assigneeId], references: [id], onDelete: SetNull)
-  comments    Comment[]
+  project  Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignee User?     @relation("AssignedTasks", fields: [assigneeId], references: [id], onDelete: SetNull)
+  comments Comment[]
 
   @@map("tasks")
 }
@@ -75,16 +78,17 @@ model Comment {
   content   String
   createdAt DateTime @default(now())
 
-  taskId    String
-  userId    String
+  taskId String
+  userId String
 
-  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("comments")
 }
 
 enum Role {
+  OWNER
   ADMIN
   MEMBER
   VIEWER
