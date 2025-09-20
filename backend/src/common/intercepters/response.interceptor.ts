@@ -31,7 +31,7 @@ export class ResponseInterceptor<T>
         success: statusCode >= 200 && statusCode < 300,
         message: this.getMessage(statusCode, data),
         timestamp: new Date(),
-        data: data || null,
+        data: data?.data || data || null,
       })),
     );
   }
