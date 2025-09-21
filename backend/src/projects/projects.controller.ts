@@ -27,11 +27,16 @@ import { ProjectWithDetails } from './types/project-with-details.interface';
 import { Project } from '@prisma/client';
 import { ProjectMemberResponse } from './types/project-member.interface';
 import { BasicResponse } from 'src/common/types/basic-response-type';
+import { TasksService } from 'src/tasks/tasks.service';
+import { CreateTaskDto } from 'src/tasks/dtos/create-task.dto';
 
 @Controller('projects')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(
+    private readonly projectsService: ProjectsService,
+    private readonly tasksService: TasksService,
+  ) {}
   @Get()
   @HttpCode(HttpStatus.OK)
   getAll(): Promise<Response<ProjectWithCounts[]>> {
@@ -39,8 +44,11 @@ export class ProjectsController {
   }
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  getOne(@Param('id') id: string): Promise<Response<ProjectWithDetails>> {
-    return this.projectsService.getProject(id);
+  getOne(
+    @Param('id') id: string,
+    @Req() req: { user: { id: string } },
+  ): Promise<Response<ProjectWithDetails>> {
+    return this.projectsService.getProject(id, req.user.id);
   }
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -57,44 +65,94 @@ export class ProjectsController {
   update(
     @Param('id') id: string,
     @Body() project: UpdateProjectDto,
+    @Req() req: { user: { id: string } },
   ): Promise<Response<ProjectWithDetails>> {
-    return this.projectsService.updateProject(id, project);
+    return this.projectsService.updateProject(id, project, req.user.id);
   }
   @Post(':id/members')
   @Roles(Role.ADMIN)
   addMemberToProject(
     @Param('id') id: string,
     @Body() addMemberToProject: AddMemberToProjectDto,
+    @Req() req: { user: { id: string } },
   ): Promise<Response<ProjectMemberResponse>> {
-    return this.projectsService.addMemberToProject(id, addMemberToProject);
+    return this.projectsService.addMemberToProject(
+      id,
+      addMemberToProject,
+      req.user.id,
+    );
   }
   @Delete(':id/members/:memberId')
   @Roles(Role.ADMIN)
   removeMemberFromProject(
     @Param('id') id: string,
     @Param('memberId') memberId: string,
+    @Req() req: { user: { id: string } },
   ): Promise<{
     projectId: string;
     userId: string;
     message: string;
   }> {
-    return this.projectsService.removeMemberFromProject(id, memberId);
+    return this.projectsService.removeMemberFromProject(
+      id,
+      memberId,
+      req.user.id,
+    );
   }
+  @Delete(':id')
+  @Roles(Role.OWNER)
+  deleteProject(
+    @Param('id') id: string,
+    @Req() req: { user: { id: string } },
+  ): Promise<BasicResponse> {
+    return this.projectsService.deleteProject(id, req.user.id);
+  }
+
   @Put(':id/members/:memberId')
   @Roles(Role.ADMIN)
   changeMemberRole(
     @Param('id') id: string,
     @Param('memberId') memberId: string, // userId
     @Body() memberRole: ChangeMemberRoleDto,
+    @Req() req: { user: { id: string } },
   ): Promise<BasicResponse> {
-    return this.projectsService.changeMemberRole(id, memberId, memberRole.role);
+    return this.projectsService.changeMemberRole(
+      id,
+      memberId,
+      memberRole.role,
+      req.user.id,
+    );
   }
   @Put(':id/transfer-ownership/:newOwnerId')
   @Roles(Role.OWNER)
   transferOwnership(
     @Param('id') projectId: string,
     @Param('newOwnerId') newOwnerId: string,
+    @Req() req: { user: { id: string } },
   ): Promise<Response<ProjectWithDetails>> {
-    return this.projectsService.transferOwnership(projectId, newOwnerId);
+    return this.projectsService.transferOwnership(
+      projectId,
+      newOwnerId,
+      req.user.id,
+    );
+  }
+  @Get(':id/tasks')
+  @Roles(Role.ADMIN, Role.OWNER, Role.VIEWER, Role.MEMBER)
+  @HttpCode(HttpStatus.OK)
+  getTasksForSingleProject(
+    @Param('id') id: string,
+    @Req() req: { user: { id: string } },
+  ) {
+    return this.tasksService.getAllTasksForSingleProject(id, req.user.id);
+  }
+  @Post(':id/tasks')
+  @Roles(Role.ADMIN, Role.OWNER, Role.MEMBER)
+  @HttpCode(HttpStatus.CREATED)
+  createTask(
+    @Param('id') id: string,
+    @Body() createTaskDto: CreateTaskDto,
+    @Req() req: { user: { id: string } },
+  ) {
+    return this.tasksService.createTask(createTaskDto, id, req.user.id);
   }
 }

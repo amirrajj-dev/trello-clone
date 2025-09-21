@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotAcceptableException,
@@ -59,7 +60,10 @@ export class ProjectsService {
     };
   }
 
-  async getProject(projectId: string): Promise<Response<ProjectWithDetails>> {
+  async getProject(
+    projectId: string,
+    userId: string,
+  ): Promise<Response<ProjectWithDetails>> {
     const project = await this.prismaService.project.findUnique({
       where: {
         id: projectId,
@@ -102,6 +106,13 @@ export class ProjectsService {
     if (!project) {
       throw new NotFoundException('Project Not Found');
     }
+    const projectMember = await this.prismaService.projectMember.findUnique({
+      where: { userId_projectId: { userId, projectId: projectId } },
+    });
+    if (!projectMember) {
+      throw new ForbiddenException('You are not a member of this project');
+    }
+
     this.logger.log('Project Fetched Succesfully');
     return {
       data: project,
@@ -155,14 +166,21 @@ export class ProjectsService {
   async updateProject(
     id: string,
     project: UpdateProjectDto,
+    userIdFromReq: string,
   ): Promise<Response<ProjectWithDetails>> {
     try {
-      const { data: projectToUpdate } = await this.getProject(id);
+      const { data: projectToUpdate } = await this.getProject(
+        id,
+        userIdFromReq,
+      );
       const updates: { name?: string; description?: string } = {};
       if (project.name) updates.name = project.name;
       if (project.description) updates.description = project.description;
       if (Object.keys(updates).length === 0) {
-        return this.getProject(projectToUpdate.id);
+        return {
+          data: projectToUpdate,
+          message: 'No Updates',
+        };
       }
       await this.prismaService.project.update({
         where: {
@@ -174,7 +192,7 @@ export class ProjectsService {
         },
       });
       this.logger.log('Project Updated Succesfully');
-      const { data } = await this.getProject(projectToUpdate.id);
+      const { data } = await this.getProject(projectToUpdate.id, userIdFromReq);
       return {
         data,
         message: 'Project Updated Succesfully',
@@ -190,8 +208,9 @@ export class ProjectsService {
   async addMemberToProject(
     projectId: string,
     data: AddMemberToProjectDto,
+    userIdFromReq: string,
   ): Promise<Response<ProjectMemberResponse>> {
-    const { data: project } = await this.getProject(projectId);
+    const { data: project } = await this.getProject(projectId, userIdFromReq);
     const { userId, role } = data;
     const user = await this.usersService.findUserById(userId);
     const existing = await this.prismaService.projectMember.findUnique({
@@ -230,9 +249,15 @@ export class ProjectsService {
   async removeMemberFromProject(
     projectId: string,
     userId: string,
+    userIdFromReq: string,
   ): Promise<{ projectId: string; userId: string; message: string }> {
-    await this.getProject(projectId);
+    const { data: project } = await this.getProject(projectId, userIdFromReq);
     await this.usersService.findUserById(userId);
+    if (project.ownerId === userId) {
+      throw new ForbiddenException(
+        'The User Your Trying To Delete is the Owner Of The Project',
+      );
+    }
     await this.prismaService.projectMember.delete({
       where: {
         userId_projectId: {
@@ -252,8 +277,9 @@ export class ProjectsService {
     projectId: string,
     userId: string,
     role: Role,
+    userIdFromReq: string,
   ): Promise<BasicResponse> {
-    await this.getProject(projectId);
+    await this.getProject(projectId, userIdFromReq);
     await this.usersService.findUserById(userId);
     if (role === Role.OWNER) {
       throw new NotAcceptableException('Cannot change role to OWNER');
@@ -280,8 +306,9 @@ export class ProjectsService {
   async transferOwnership(
     projectId: string,
     newOwnerId: string,
+    userIdFromReq: string,
   ): Promise<Response<ProjectWithDetails>> {
-    const { data: project } = await this.getProject(projectId);
+    const { data: project } = await this.getProject(projectId, userIdFromReq);
 
     if (!project.ownerId)
       throw new NotAcceptableException('Owner Id is Required');
@@ -312,7 +339,10 @@ export class ProjectsService {
       }),
     ]);
 
-    const { data: updatedProject } = await this.getProject(projectId);
+    const { data: updatedProject } = await this.getProject(
+      projectId,
+      userIdFromReq,
+    );
 
     this.logger.log(
       `Ownership transferred to user ${newOwnerId} from ${project.ownerId}`,
@@ -321,5 +351,24 @@ export class ProjectsService {
       message: `Ownership transferred to user ${newOwnerId}`,
       data: updatedProject,
     };
+  }
+  async deleteProject(
+    projectId: string,
+    userIdFromReq: string,
+  ): Promise<BasicResponse> {
+    const { data: project } = await this.getProject(projectId, userIdFromReq);
+
+    if (project.ownerId !== userIdFromReq) {
+      throw new ForbiddenException(`Your Not Allowed For This Operation`);
+    }
+
+    await this.prismaService.$transaction([
+      this.prismaService.task.deleteMany({ where: { projectId } }),
+      this.prismaService.projectMember.deleteMany({ where: { projectId } }),
+      this.prismaService.project.delete({ where: { id: projectId } }),
+    ]);
+
+    this.logger.log(`Project ${projectId} deleted by user ${userIdFromReq}`);
+    return { message: `Project ${projectId} deleted successfully` };
   }
 }
