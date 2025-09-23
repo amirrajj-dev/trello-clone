@@ -11,6 +11,8 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { PrismaModule } from './prisma/prisma.module';
 import { LoggerModule } from './common/logger/logger.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -27,6 +29,7 @@ import { LoggerModule } from './common/logger/logger.module';
         CLOUDINARY_API_SECRET: Joi.string().required(),
       }),
     }),
+    EventEmitterModule.forRoot(),
     PrismaModule,
     LoggerModule,
     AuthModule,
@@ -35,6 +38,7 @@ import { LoggerModule } from './common/logger/logger.module';
     TasksModule,
     CommentsModule,
     NotificationsModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
