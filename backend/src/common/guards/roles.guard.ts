@@ -26,7 +26,10 @@ export class RolesGuard implements CanActivate {
       return true; // no roles required
     }
     const request: Request = context.switchToHttp().getRequest();
-    const user = request.user as User;
+    const user = request.user as User | undefined;
+    if (!user) {
+      throw new ForbiddenException('User not authenticated');
+    }
     const projectId = request.params.id;
     const project = await this.prismaService.project.findUnique({
       where: {
