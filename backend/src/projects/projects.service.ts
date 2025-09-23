@@ -18,12 +18,15 @@ import { ProjectWithCounts } from './types/project-with-count.interface';
 import { ProjectWithDetails } from './types/project-with-details.interface';
 import { ProjectMemberResponse } from './types/project-member.interface';
 import { BasicResponse } from 'src/common/types/basic-response-type';
+import { NotificationOptions } from 'src/common/enums/notification.enum';
+import { EventsService } from 'src/events/events.service';
 
 @Injectable()
 export class ProjectsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly usersService: UsersService,
+    private readonly notificationsService: EventsService,
     private logger: WinstonLogger,
   ) {}
 
@@ -192,6 +195,18 @@ export class ProjectsService {
         },
       });
       this.logger.log('Project Updated Succesfully');
+      const projectMembers = await this.prismaService.projectMember.findMany({
+        where: { projectId: projectToUpdate.id },
+        select: { userId: true },
+      });
+      for (const member of projectMembers) {
+        await this.notificationsService.sendNotification(
+          member.userId,
+          NotificationOptions.PROJECT_UPDATED,
+          `The project "${projectToUpdate.name}" has been updated`,
+          { projectId: projectToUpdate.id },
+        );
+      }
       const { data } = await this.getProject(projectToUpdate.id, userIdFromReq);
       return {
         data,
@@ -228,6 +243,13 @@ export class ProjectsService {
       },
     });
     this.logger.log(`${user.name} added to the project ${project.name}`);
+    await this.notificationsService.sendNotification(
+      user.id,
+      NotificationOptions.PROJECT_MEMBER_ADDED,
+      `You were added to the project "${project.name}"`,
+      { projectId: project.id },
+    );
+
     return {
       data: {
         id: projectMember.id,
@@ -266,6 +288,13 @@ export class ProjectsService {
         },
       },
     });
+    await this.notificationsService.sendNotification(
+      userId,
+      NotificationOptions.PROJECT_MEMBER_REMOVED,
+      `You were removed from the project "${project.name}"`,
+      { projectId },
+    );
+
     this.logger.log(`User ${userId} removed from project ${projectId}`);
     return {
       projectId,
@@ -279,7 +308,7 @@ export class ProjectsService {
     role: Role,
     userIdFromReq: string,
   ): Promise<BasicResponse> {
-    await this.getProject(projectId, userIdFromReq);
+    const { data: project } = await this.getProject(projectId, userIdFromReq);
     await this.usersService.findUserById(userId);
     if (role === Role.OWNER) {
       throw new NotAcceptableException('Cannot change role to OWNER');
@@ -296,6 +325,13 @@ export class ProjectsService {
         },
       });
     }
+    await this.notificationsService.sendNotification(
+      userId,
+      NotificationOptions.ROLE_CHANGED,
+      `Your role in project "${project.name}" has been changed to ${role}`,
+      { projectId },
+    );
+
     this.logger.log(
       `user ${userId} role for the project ${projectId} updated to ${role}`,
     );
@@ -347,6 +383,22 @@ export class ProjectsService {
     this.logger.log(
       `Ownership transferred to user ${newOwnerId} from ${project.ownerId}`,
     );
+    // Notify the new owner
+    await this.notificationsService.sendNotification(
+      newOwnerId,
+      NotificationOptions.OWNERSHIP_TRANSFERRED,
+      `You are now the owner of the project "${project.name}"`,
+      { projectId },
+    );
+
+    // notify the old owner
+    await this.notificationsService.sendNotification(
+      project.ownerId,
+      NotificationOptions.OWNERSHIP_TRANSFERRED,
+      `You are no longer the owner of the project "${project.name}"`,
+      { projectId },
+    );
+
     return {
       message: `Ownership transferred to user ${newOwnerId}`,
       data: updatedProject,
@@ -361,7 +413,19 @@ export class ProjectsService {
     if (project.ownerId !== userIdFromReq) {
       throw new ForbiddenException(`Your Not Allowed For This Operation`);
     }
+    const projectMembers = await this.prismaService.projectMember.findMany({
+      where: { projectId },
+      select: { userId: true },
+    });
 
+    for (const member of projectMembers) {
+      await this.notificationsService.sendNotification(
+        member.userId,
+        NotificationOptions.PROJECT_DELETED,
+        `The project "${project.name}" has been deleted`,
+        { projectId },
+      );
+    }
     await this.prismaService.$transaction([
       this.prismaService.task.deleteMany({ where: { projectId } }),
       this.prismaService.projectMember.deleteMany({ where: { projectId } }),

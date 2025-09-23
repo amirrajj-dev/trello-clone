@@ -14,12 +14,15 @@ import { Response } from 'src/common/types/response.type';
 import { Task } from './types/task.interface';
 import { TaskDeleteResponse } from './types/task-delete.interface';
 import { TASKSTATUS } from 'src/common/enums/task-status.enum';
+import { NotificationOptions } from 'src/common/enums/notification.enum';
+import { EventsService } from 'src/events/events.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly projectsService: ProjectsService,
+    private readonly notificationsService: EventsService,
     private logger: WinstonLogger,
   ) {}
   async createTask(
@@ -44,7 +47,17 @@ export class TasksService {
         status: task.status ?? TASKSTATUS.TODO,
       },
     });
+
     this.logger.log(`Task ${newTask.id} Created Successfully`);
+    if (newTask.assigneeId) {
+      await this.notificationsService.sendNotification(
+        newTask.assigneeId,
+        NotificationOptions.TASK_ASSIGNED,
+        `You have been assigned a new task: ${newTask.title}`,
+        { taskId: newTask.id, projectId },
+      );
+    }
+
     return {
       message: 'Task created successfully',
       data: newTask,
@@ -72,13 +85,12 @@ export class TasksService {
     userId: string,
   ): Promise<Response<Task>> {
     const task = await this.prismaService.task.findUnique({
-      where: {
-        id: taskId,
-      },
+      where: { id: taskId },
     });
     if (!task) {
       throw new NotFoundException('Task Not Found');
     }
+
     const projectMember = await this.prismaService.projectMember.findUnique({
       where: { userId_projectId: { userId, projectId: task.projectId } },
     });
@@ -95,8 +107,9 @@ export class TasksService {
           },
         },
       });
-      if (!member)
+      if (!member) {
         throw new BadRequestException('Assignee must be a project member');
+      }
     }
 
     const updates: {
@@ -109,23 +122,78 @@ export class TasksService {
     } = Object.fromEntries(
       Object.entries(updateTaskDto).filter(([_, value]) => value !== undefined),
     );
+
     if (Object.keys(updates).length === 0) {
-      return {
-        message: 'No Fields To Update',
-        data: task,
-      };
+      return { message: 'No Fields To Update', data: task };
     }
+
     const updatedTask = await this.prismaService.task.update({
-      where: {
-        id: task.id,
-      },
+      where: { id: task.id },
       data: updates,
     });
+
     this.logger.log(`Task ${updatedTask.id} Updated Successfully`);
-    return {
-      message: 'Task updated successfully',
-      data: updatedTask,
-    };
+
+    // notifications
+    const notifications: Array<{ userId: string; payload: any }> = [];
+
+    if (
+      updates.assigneeId &&
+      task.assigneeId &&
+      task.assigneeId !== updates.assigneeId
+    ) {
+      // old assignee unassigned
+      notifications.push({
+        userId: task.assigneeId,
+        payload: {
+          type: NotificationOptions.TASK_UNASSIGNED,
+          taskId: updatedTask.id,
+          projectId: task.projectId,
+          message: `You have been unassigned from task "${updatedTask.title}".`,
+        },
+      });
+    }
+
+    if (updates.assigneeId) {
+      // new assignee assigned
+      notifications.push({
+        userId: updates.assigneeId,
+        payload: {
+          type: NotificationOptions.TASK_ASSIGNED,
+          taskId: updatedTask.id,
+          projectId: task.projectId,
+          message: `Task "${updatedTask.title}" has been assigned to you.`,
+        },
+      });
+    }
+
+    if (updates.status && updatedTask.assigneeId) {
+      // notify assignee about status change
+      notifications.push({
+        userId: updatedTask.assigneeId,
+        payload: {
+          type: NotificationOptions.TASK_STATUS_CHANGED,
+          taskId: updatedTask.id,
+          projectId: task.projectId,
+          message: `Task "${updatedTask.title}" status changed to ${updates.status}.`,
+        },
+      });
+    }
+
+    // send all notifications
+    for (const { userId, payload } of notifications) {
+      await this.notificationsService.sendNotification(
+        userId,
+        payload.type,
+        payload.message,
+        {
+          taskId: payload.taskId,
+          projectId: payload.projectId,
+        },
+      );
+    }
+
+    return { message: 'Task updated successfully', data: updatedTask };
   }
   async deleteTask(
     taskId: string,
@@ -151,6 +219,30 @@ export class TasksService {
       },
     });
     this.logger.log(`Task ${taskId} Deleted Successfully`);
+    if (task.assigneeId) {
+      await this.notificationsService.sendNotification(
+        task.assigneeId,
+        NotificationOptions.TASK_DELETED,
+        `Your task "${task.title}" was deleted.`,
+        { taskId: task.id, projectId: task.projectId },
+      );
+    }
+
+    // Notify project owner
+    const project = await this.prismaService.project.findUnique({
+      where: { id: task.projectId },
+      select: { ownerId: true },
+    });
+
+    if (project?.ownerId && project.ownerId !== task.assigneeId) {
+      await this.notificationsService.sendNotification(
+        project.ownerId,
+        NotificationOptions.TASK_DELETED,
+        `Task "${task.title}" was deleted from your project.`,
+        { taskId: task.id, projectId: task.projectId },
+      );
+    }
+
     return {
       message: 'Task deleted successfully',
       data: { id: task.id, projectId: task.projectId },

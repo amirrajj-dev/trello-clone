@@ -61,6 +61,7 @@ export class ProjectsController {
     return this.projectsService.createProject(project, ownerId);
   }
   @Put(':id')
+  @Roles(Role.OWNER)
   @HttpCode(HttpStatus.OK)
   update(
     @Param('id') id: string,

@@ -11,11 +11,15 @@ import { CommentWithUser } from './types/Comment-with-user.interface';
 import { Response } from 'src/common/types/response.type';
 import { CommentDeleteResponse } from './types/comment-delete-response.interface';
 import { Comment } from './types/comment.interface';
+import { NotificationOptions } from 'src/common/enums/notification.enum';
+import { EventsService } from 'src/events/events.service';
 
 @Injectable()
 export class CommentsService {
   constructor(
     private readonly prismaService: PrismaService,
+    private readonly notificationsService: EventsService,
+
     private logger: WinstonLogger,
   ) {}
   private async assertProjectMember(userId: string, projectId: string) {
@@ -52,6 +56,15 @@ export class CommentsService {
       },
       include: { user: { select: { name: true, avatarUrl: true } } },
     });
+
+    if (task.assigneeId && task.assigneeId !== userIdFromReq) {
+      await this.notificationsService.sendNotification(
+        task.assigneeId,
+        NotificationOptions.COMMENT_ADDED,
+        `New comment on task "${task.title}": "${comment.content}"`,
+        { taskId, projectId: task.projectId },
+      );
+    }
 
     this.logger.log(`comment ${newComment.id} Created Succssfully`);
     return {
@@ -147,6 +160,15 @@ export class CommentsService {
         content: updateCommentDto.content,
       },
     });
+    if (comment.userId !== userIdFromReq) {
+      await this.notificationsService.sendNotification(
+        comment.userId,
+        NotificationOptions.COMMENT_UPDATED,
+        'Your comment was updated by a project admin.',
+        { taskId: comment.taskId, commentId: comment.id },
+      );
+    }
+
     this.logger.log(`Comment ${commentId} Updated Successfully`);
     return {
       data: updatedComment,
@@ -192,6 +214,15 @@ export class CommentsService {
       },
     });
     this.logger.log(`Comment ${commentId} Deleted Successfully`);
+    if (comment.userId !== userIdFromReq) {
+      await this.notificationsService.sendNotification(
+        comment.userId,
+        NotificationOptions.COMMENT_DELETED,
+        'Your comment was deleted by a project admin.',
+        { taskId: comment.taskId, commentId: comment.id },
+      );
+    }
+
     return {
       message: 'Comment deleted successfully',
       data: {
