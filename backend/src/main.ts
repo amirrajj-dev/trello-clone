@@ -9,6 +9,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const NODE_ENV = configService.get<string>('NODE_ENV');
+  app.enableCors({
+    origin: [
+      process.env.FRONTEND_URL || 'http://localhost:3000', // Vercel frontend URL
+      ...(NODE_ENV === 'development' ? ['http://localhost:3000'] : []), // local dev
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true, // For authenticated WebSocket connections
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,

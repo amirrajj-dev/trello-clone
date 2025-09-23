@@ -11,8 +11,12 @@ import { Notification } from './types/notification.interface';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { validateSync } from 'class-validator';
 import { NotificationDto } from './dtos/notification.dto';
-
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({
+  cors: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    credentials: true,
+  },
+})
 export class NotificationsGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {

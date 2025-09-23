@@ -27,6 +27,7 @@ import { EventsModule } from './events/events.module';
         CLOUDINARY_CLOUD_NAME: Joi.string().required(),
         CLOUDINARY_API_KEY: Joi.string().required(),
         CLOUDINARY_API_SECRET: Joi.string().required(),
+        FRONTEND_URL: Joi.string().required().default('http://localhost:3000'),
       }),
     }),
     EventEmitterModule.forRoot(),
