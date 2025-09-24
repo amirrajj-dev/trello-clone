@@ -2,3 +2,16 @@
 @plugin "daisyui" {
   themes: light --default, dark --prefersdark , coffee, night , forest , dracula;
 }
+
+
+@layer base {
+  [data-sonner-toast][data-x-position=right] {
+    @apply bg-base-300! border-none!
+  }
+  [data-sonner-toast][data-styled=true] [data-title]{
+    @apply text-transparent! bg-clip-text! bg-gradient-to-r! from-primary! to-accent!
+  }
+  [data-sonner-toast][data-styled=true] [data-icon] {
+    @apply text-accent!
+  }
+}
