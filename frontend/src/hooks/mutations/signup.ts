@@ -12,7 +12,7 @@ export const useSignup = () => {
       return response.data
     },
     onSuccess: async (response) => {
-      const {access_token} = response.data;
+      const {access_token} = response;
       // Set cookie with 1h expiry
       await setCookie(
         access_token,

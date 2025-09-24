@@ -12,7 +12,7 @@ export const useLogin = () => {
       return response.data;
     },
     onSuccess: async (response) => {
-      const { access_token } = response.data;
+      const { access_token } = response;
       // Set cookie with 30-day expiry
       await setCookie(
         access_token,

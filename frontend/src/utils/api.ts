@@ -24,12 +24,12 @@ import {
 // Auth API
 const authApi = {
   signup: (api: AxiosInstance, user: SignUpUserDto) =>
-    api.post<ApiResponse<{ access_token: string; user: User }>>(
+    api.post<{ access_token: string; user: User }>(
       "/auth/signup",
       user
     ),
   login: (api: AxiosInstance, user: LoginUserDto) =>
-    api.post<ApiResponse<{ access_token: string; user: User }>>(
+    api.post<{ access_token: string; user: User }>(
       "/auth/login",
       user
     ),
