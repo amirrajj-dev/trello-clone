@@ -1,10 +1,8 @@
-import SignUp from '@/components/auth/signup/Signup'
-import React from 'react'
+import SignUp from "@/components/auth/signup/Signup";
+import React from "react";
 
 const SignUpPage = () => {
-  return (
-    <SignUp/>
-  )
-}
+  return <SignUp />;
+};
 
-export default SignUpPage
+export default SignUpPage;

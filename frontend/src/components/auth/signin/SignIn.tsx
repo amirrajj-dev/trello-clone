@@ -1,37 +1,37 @@
-"use client";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { schema, SignUpType } from "@/validations/auth/register.validation";
-import { useSignup } from "@/hooks/mutations/signup";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
-import Logo from "@/components/common/logo/Logo";
-import Link from "next/link";
+'use client';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { schema, SignInType } from '@/validations/auth/login.validation';
+import { useLogin } from '@/hooks/mutations/login';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import Logo from '@/components/common/logo/Logo';
+import Link from 'next/link';
 
-const SignUp = () => {
+const SignIn = () => {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<SignUpType>({
+  } = useForm<SignInType>({
     resolver: zodResolver(schema),
   });
-  const { mutateAsync: signup, isPending: isLoading } = useSignup();
+  const { mutateAsync: login, isPending: isLoading } = useLogin();
   const router = useRouter();
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
-  const onSubmit = async (data: SignUpType) => {
+  const onSubmit = async (data: SignInType) => {
     try {
-      await signup(data);
-      toast.success("Account created successfully!");
+      await login(data);
+      toast.success('Logged in successfully!');
       setTimeout(() => {
-        router.push("/");
+        router.push('/');
       }, 5000);
     } catch (error: any) {
-      toast.error(error.message || "Failed to sign up" , {duration : 100000});
+      toast.error(error.message || 'Failed to sign in', { duration: 100000 });
     }
   };
 
@@ -57,7 +57,7 @@ const SignUp = () => {
             transition={{ duration: 0.5, delay: 1 }}
             className="card-title text-2xl font-bold text-center mx-auto text-transparent bg-clip-text bg-gradient-to-tr from-primary to-accent"
           >
-            Sign Up
+            Sign In
           </motion.h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="flex flex-col gap-1">
@@ -67,7 +67,7 @@ const SignUp = () => {
                 transition={{ duration: 0.3, delay: 1.1 }}
                 className="label"
               >
-                <span className="label-text">Name</span>
+                <span className="label-text">Email</span>
               </motion.label>
               <motion.div
                 className="relative"
@@ -76,17 +76,15 @@ const SignUp = () => {
                 transition={{ duration: 0.5, delay: 1.2 }}
               >
                 <input
-                  type="text"
-                  placeholder="Enter your name"
+                  type="email"
+                  placeholder="Enter your email"
                   className="input focus:outline-none w-full pl-10"
-                  {...register("name")}
+                  {...register('email')}
                 />
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/50 z-10" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/50 z-10" />
               </motion.div>
-              {errors.name && (
-                <span className="text-error text-sm">
-                  {errors.name.message}
-                </span>
+              {errors.email && (
+                <span className="text-error text-sm">{errors.email.message}</span>
               )}
             </div>
             <div className="flex flex-col gap-1">
@@ -96,7 +94,7 @@ const SignUp = () => {
                 transition={{ duration: 0.3, delay: 1.4 }}
                 className="label"
               >
-                <span className="label-text">Email</span>
+                <span className="label-text">Password</span>
               </motion.label>
               <motion.div
                 className="relative"
@@ -105,39 +103,10 @@ const SignUp = () => {
                 transition={{ duration: 0.5, delay: 1.5 }}
               >
                 <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="input focus:outline-none w-full pl-10"
-                  {...register("email")}
-                />
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/50 z-10" />
-              </motion.div>
-              {errors.email && (
-                <span className="text-error text-sm">
-                  {errors.email.message}
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col gap-1">
-              <motion.label
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: 1.7 }}
-                className="label"
-              >
-                <span className="label-text">Password</span>
-              </motion.label>
-              <motion.div
-                className="relative"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 1.8 }}
-              >
-                <input
-                  type={`${isPasswordVisible ? "text" : "password"}`}
+                  type={isPasswordVisible ? 'text' : 'password'}
                   placeholder="Enter your password"
                   className="input focus:outline-none w-full pl-10"
-                  {...register("password")}
+                  {...register('password')}
                 />
                 {isPasswordVisible ? (
                   <EyeOff
@@ -153,9 +122,7 @@ const SignUp = () => {
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/50 z-10" />
               </motion.div>
               {errors.password && (
-                <span className="text-error text-sm">
-                  {errors.password.message}
-                </span>
+                <span className="text-error text-sm">{errors.password.message}</span>
               )}
             </div>
             <div className="form-control mt-6">
@@ -165,13 +132,13 @@ const SignUp = () => {
                 disabled={isSubmitting || isLoading}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 2 }}
+                transition={{ duration: 0.4, delay: 1.7 }}
                 whileTap={{ scale: 0.95 }}
               >
                 {isSubmitting || isLoading ? (
                   <span className="loading loading-spinner"></span>
                 ) : (
-                  "Sign Up"
+                  'Sign In'
                 )}
               </motion.button>
             </div>
@@ -180,15 +147,15 @@ const SignUp = () => {
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 2.2 }}
+              transition={{ duration: 0.3, delay: 1.9 }}
               className="text-sm flex items-center justify-center gap-2"
             >
-              <span>Already have an account? </span>
+              <span>Don’t have an account?</span>
               <Link
-                href="/signin"
+                href="/signup"
                 className="link bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent"
               >
-                SignIn
+                Sign Up
               </Link>
             </motion.p>
           </div>
@@ -198,4 +165,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default SignIn;
