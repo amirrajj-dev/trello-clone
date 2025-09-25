@@ -218,6 +218,7 @@ export class UsersService {
         projectId: true,
         createdAt: true,
         updatedAt: true,
+        progress: true,
         dueDate: true,
         project: {
           select: {
