@@ -60,8 +60,14 @@ export class ProjectsService {
             user: {
               select: {
                 name: true,
+                avatarUrl: true,
               },
             },
+          },
+        },
+        tasks: {
+          select: {
+            progress: true,
           },
         },
       },
