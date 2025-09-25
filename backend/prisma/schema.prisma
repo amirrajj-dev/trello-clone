@@ -64,6 +64,7 @@ model Task {
   dueDate     DateTime?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+  progress    Int        @default(0)
 
   projectId  String
   assigneeId String?
@@ -116,6 +117,7 @@ enum NotificationType {
   TASK_UNASSIGNED
   TASK_STATUS_CHANGED
   TASK_DELETED
+  TASK_PROGRESS_UPDATED
   COMMENT_ADDED
   COMMENT_UPDATED
   COMMENT_DELETED

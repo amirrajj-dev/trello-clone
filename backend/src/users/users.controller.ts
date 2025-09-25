@@ -38,8 +38,13 @@ export class UsersController {
   }
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  getMe(@Req() req): Promise<SafeUser> {
+  getMe(@Req() req: { user: { id: string } }): Promise<SafeUser> {
     return this.usersService.getMe(req.user.id);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('me/tasks')
+  getTasks(@Req() req: { user: { id: string } }) {
+    return this.usersService.getUserTasks(req.user.id);
   }
   @UseGuards(JwtAuthGuard)
   @Get('/:id')

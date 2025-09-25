@@ -30,8 +30,18 @@ export class ProjectsService {
     private logger: WinstonLogger,
   ) {}
 
-  async getProjects(): Promise<Response<ProjectWithCounts[]>> {
+  async getProjects(userId: string): Promise<Response<ProjectWithCounts[]>> {
     const projects = await this.prismaService.project.findMany({
+      where: {
+        OR: [
+          { ownerId: userId },
+          {
+            members: {
+              some: { userId },
+            },
+          },
+        ],
+      },
       select: {
         id: true,
         name: true,

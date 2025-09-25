@@ -204,4 +204,32 @@ export class UsersService {
   async getMe(userId: string): Promise<SafeUser> {
     return this.findUserById(userId);
   }
+  async getUserTasks(userId: string) {
+    const tasks = await this.prismaService.task.findMany({
+      where: {
+        assigneeId: userId,
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        assigneeId: true,
+        projectId: true,
+        createdAt: true,
+        updatedAt: true,
+        dueDate: true,
+        project: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+    return {
+      data: tasks,
+      message: 'Tasks Fetched Succesfully',
+    };
+  }
 }

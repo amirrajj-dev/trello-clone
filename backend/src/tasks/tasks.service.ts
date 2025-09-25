@@ -119,6 +119,7 @@ export class TasksService {
       priority?: PRIORITY;
       assigneeId?: string;
       dueDate?: Date;
+      progress?: number;
     } = Object.fromEntries(
       Object.entries(updateTaskDto).filter(([_, value]) => value !== undefined),
     );
@@ -178,6 +179,24 @@ export class TasksService {
           message: `Task "${updatedTask.title}" status changed to ${updates.status}.`,
         },
       });
+    }
+    // sending notification to project owner 🤓
+    if (updatedTask.assigneeId && updates.progress !== 0) {
+      const { data: project } = await this.projectsService.getProject(
+        updatedTask.projectId,
+        userId,
+      );
+      if (project) {
+        notifications.push({
+          userId: project.ownerId,
+          payload: {
+            type: NotificationOptions.TASK_PROGRESS_UPDATED,
+            taskId: updatedTask.id,
+            projectId: task.projectId,
+            message: `Task "${updatedTask.title}" progress updated to ${updates.progress}%.`,
+          },
+        });
+      }
     }
 
     // send all notifications

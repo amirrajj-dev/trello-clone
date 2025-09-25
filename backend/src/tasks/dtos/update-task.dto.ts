@@ -2,9 +2,12 @@ import { Type } from 'class-transformer';
 import {
   IsDate,
   IsEnum,
+  IsInt,
   IsOptional,
   IsString,
+  Max,
   MaxLength,
+  Min,
   MinDate,
   MinLength,
 } from 'class-validator';
@@ -36,4 +39,9 @@ export class UpdateTaskDto {
   @IsString()
   @IsOptional()
   assigneeId?: string;
+  @IsInt()
+  @IsOptional()
+  @Min(0)
+  @Max(100)
+  progress?: number;
 }

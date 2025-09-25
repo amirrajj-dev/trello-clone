@@ -39,8 +39,10 @@ export class ProjectsController {
   ) {}
   @Get()
   @HttpCode(HttpStatus.OK)
-  getAll(): Promise<Response<ProjectWithCounts[]>> {
-    return this.projectsService.getProjects();
+  getAll(
+    @Req() req: { user: { id: string } },
+  ): Promise<Response<ProjectWithCounts[]>> {
+    return this.projectsService.getProjects(req.user.id);
   }
   @Get(':id')
   @HttpCode(HttpStatus.OK)
