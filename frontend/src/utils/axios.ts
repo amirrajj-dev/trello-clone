@@ -20,9 +20,9 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle backend response and errors
+// Handle errors only
 api.interceptors.response.use(
-  (response) => response.data,
+  (response) => response, // full response
   (error: AxiosError<{ message?: string }>) => {
     const message =
       error.response?.data?.message || error.message || "Something went wrong";
