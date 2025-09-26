@@ -16,15 +16,17 @@ export interface Project {
   createdAt: string;
   updatedAt: string;
   ownerId: string;
-}
-
-export interface ProjectWithDetails extends Project {
-  members: ProjectMember[];
-  tasks: Task[];
   _count: {
     members: number;
     tasks: number;
   };
+  members: { user: { name: string; avatarUrl: string | null } }[];
+  tasks: { progress: number }[];
+}
+
+export interface ProjectWithDetails extends Project {
+  members: ProjectMember[];
+  tasks: (Task & { progress: number })[];
 }
 
 export interface ProjectMember {
@@ -32,10 +34,7 @@ export interface ProjectMember {
   role: Role;
   userId: string;
   projectId: string;
-  user: {
-    name: string;
-    avatarUrl?: string | null;
-  };
+  user: { name: string; avatarUrl: string | null};
 }
 
 export interface Task {
@@ -48,6 +47,12 @@ export interface Task {
   createdAt: string;
   updatedAt: string;
   projectId: string;
+  progress: number;
+  project: {
+    name: string;
+    ownerId : string;
+    id : string
+  };
   assigneeId?: string | null;
 }
 
