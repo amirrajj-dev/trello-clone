@@ -1,11 +1,9 @@
-import React from 'react'
+import React from "react";
+import Home from "@/components/pages/home/Home";
 
 const HomePage = () => {
-  return (
-    <div>
-      <button className='btn btn-success m-4 rounded-md'>click me</button>
-    </div>
-  )
+
+  return <Home/>
 }
 
-export default HomePage
+export default HomePage;
