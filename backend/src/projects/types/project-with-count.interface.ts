@@ -14,4 +14,7 @@ export interface ProjectWithCounts {
       name: string;
     };
   }>;
+  owner: {
+    name: string;
+  };
 }

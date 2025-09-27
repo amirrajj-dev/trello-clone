@@ -61,6 +61,7 @@ export class ProjectsService {
               select: {
                 name: true,
                 avatarUrl: true,
+                id: true,
               },
             },
           },
@@ -68,6 +69,11 @@ export class ProjectsService {
         tasks: {
           select: {
             progress: true,
+          },
+        },
+        owner: {
+          select: {
+            name: true,
           },
         },
       },

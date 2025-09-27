@@ -16,6 +16,7 @@ import { TaskDeleteResponse } from './types/task-delete.interface';
 import { TASKSTATUS } from 'src/common/enums/task-status.enum';
 import { NotificationOptions } from 'src/common/enums/notification.enum';
 import { EventsService } from 'src/events/events.service';
+import { TaskStatus } from '@prisma/client';
 
 @Injectable()
 export class TasksService {
@@ -124,6 +125,27 @@ export class TasksService {
       Object.entries(updateTaskDto).filter(([_, value]) => value !== undefined),
     );
 
+    if (updates.status && updates.progress === undefined) {
+      if (updates.status === TASKSTATUS.DONE) {
+        updates.progress = 100;
+      } else if (updates.status === TASKSTATUS.IN_PROGRESS) {
+        updates.progress = 50;
+      } else if (updates.status === TASKSTATUS.TODO) {
+        updates.progress = 0;
+      }
+    }
+
+    // Auto-update status based on progress changes
+    if (updates.progress !== undefined && !updates.status) {
+      if (updates.progress === 100) {
+        updates.status = TASKSTATUS.DONE;
+      } else if (updates.progress === 0) {
+        updates.status = TASKSTATUS.TODO;
+      } else if (updates.progress > 0 && updates.progress < 100) {
+        updates.status = TASKSTATUS.IN_PROGRESS;
+      }
+    }
+
     if (Object.keys(updates).length === 0) {
       return { message: 'No Fields To Update', data: task };
     }
@@ -135,7 +157,7 @@ export class TasksService {
 
     this.logger.log(`Task ${updatedTask.id} Updated Successfully`);
 
-    // notifications
+    // Notifications
     const notifications: Array<{ userId: string; payload: any }> = [];
 
     if (
@@ -143,7 +165,6 @@ export class TasksService {
       task.assigneeId &&
       task.assigneeId !== updates.assigneeId
     ) {
-      // old assignee unassigned
       notifications.push({
         userId: task.assigneeId,
         payload: {
@@ -156,7 +177,6 @@ export class TasksService {
     }
 
     if (updates.assigneeId) {
-      // new assignee assigned
       notifications.push({
         userId: updates.assigneeId,
         payload: {
@@ -169,7 +189,6 @@ export class TasksService {
     }
 
     if (updates.status && updatedTask.assigneeId) {
-      // notify assignee about status change
       notifications.push({
         userId: updatedTask.assigneeId,
         payload: {
@@ -180,8 +199,8 @@ export class TasksService {
         },
       });
     }
-    // sending notification to project owner 🤓
-    if (updatedTask.assigneeId && updates.progress !== 0) {
+
+    if (updatedTask.assigneeId && updates.progress !== undefined) {
       const { data: project } = await this.projectsService.getProject(
         updatedTask.projectId,
         userId,
@@ -199,7 +218,7 @@ export class TasksService {
       }
     }
 
-    // send all notifications
+    // Send all notifications
     for (const { userId, payload } of notifications) {
       await this.notificationsService.sendNotification(
         userId,
