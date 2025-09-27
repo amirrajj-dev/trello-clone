@@ -64,6 +64,7 @@ export class ProjectsService {
                 id: true,
               },
             },
+            role: true,
           },
         },
         tasks: {

@@ -20,7 +20,7 @@ export interface Project {
     members: number;
     tasks: number;
   };
-  members: { user: { name: string; avatarUrl: string | null; id: string } }[];
+  members: { user: { name: string; avatarUrl: string | null; id: string } , role : Role }[];
   tasks: { progress: number }[];
   owner: {
     name: string;

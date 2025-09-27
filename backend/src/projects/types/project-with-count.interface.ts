@@ -13,6 +13,7 @@ export interface ProjectWithCounts {
     user: {
       name: string;
     };
+    role: 'OWNER' | 'ADMIN' | 'MEMBER' | 'VIEWER';
   }>;
   owner: {
     name: string;
