@@ -8,6 +8,7 @@ import { useGetMe } from "@/hooks/queries/user";
 import UserMenu from "./ui/UserMenu";
 import Notifications from "./ui/Notifications";
 import NotificationsPannel from "./ui/NotificationsPannel";
+import Link from "next/link";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -39,7 +40,9 @@ const Navbar = () => {
             whileHover={{ scale: 1.05 }}
             className="flex items-center gap-2"
           >
+           <Link href={"/"}>
             <Logo size="text-2xl" />
+           </Link>
           </motion.div>
 
           {/* Right Section - Actions */}

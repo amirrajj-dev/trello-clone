@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import TanStackQueryProvider from "@/providers/tanstack-provider";
 import { Toaster } from "sonner";
+import Modal from "@/components/modal/Modal";
 
 export default function RootLayout({
   children,
@@ -14,7 +15,9 @@ export default function RootLayout({
       <body
         className={`antialiased`}
       >
-        <TanStackQueryProvider>{children}</TanStackQueryProvider>
+        <TanStackQueryProvider>{children}
+        <Modal/>
+        </TanStackQueryProvider>
         <Toaster/>
       </body>
     </html>
