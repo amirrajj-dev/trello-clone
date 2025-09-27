@@ -45,6 +45,8 @@ const userApi = {
     api.get<ApiResponse<User>>("/users/me").then((res) => res.data),
   getUser: (api: AxiosInstance, id: string) =>
     api.get<ApiResponse<User>>(`/users/${id}`).then((res) => res.data),
+  getUsers: (api: AxiosInstance) =>
+    api.get<ApiResponse<User[]>>("/users").then((res) => res.data),
   updateUser: (
     api: AxiosInstance,
     id: string,

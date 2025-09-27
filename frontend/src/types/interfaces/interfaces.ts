@@ -20,8 +20,11 @@ export interface Project {
     members: number;
     tasks: number;
   };
-  members: { user: { name: string; avatarUrl: string | null } }[];
+  members: { user: { name: string; avatarUrl: string | null; id: string } }[];
   tasks: { progress: number }[];
+  owner: {
+    name: string;
+  };
 }
 
 export interface ProjectWithDetails extends Project {
@@ -34,7 +37,7 @@ export interface ProjectMember {
   role: Role;
   userId: string;
   projectId: string;
-  user: { name: string; avatarUrl: string | null};
+  user: { name: string; avatarUrl: string | null; id: string };
 }
 
 export interface Task {
@@ -50,8 +53,8 @@ export interface Task {
   progress: number;
   project: {
     name: string;
-    ownerId : string;
-    id : string
+    ownerId: string;
+    id: string;
   };
   assigneeId?: string | null;
 }

@@ -30,7 +30,7 @@ interface UpdateProjectDto {
 
 interface AddMemberToProjectDto {
   userId: string;
-  role: Role;
+  role?: Role;
 }
 
 interface ChangeMemberRoleDto {
