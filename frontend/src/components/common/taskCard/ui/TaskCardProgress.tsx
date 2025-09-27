@@ -2,7 +2,7 @@ import { Task } from "@/types/interfaces/interfaces";
 import { motion } from "framer-motion";
 
 const TaskCardProgress = ({ task }: { task: Task }) => {
-  if (task.status !== "IN_PROGRESS" || task.progress === undefined) return null;
+  if (task.status !== "IN_PROGRESS" && task.progress === undefined) return null;
 
   return (
     <div className="mt-4 relative z-0">
