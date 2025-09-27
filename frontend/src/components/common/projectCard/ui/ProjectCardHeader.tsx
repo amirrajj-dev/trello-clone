@@ -1,4 +1,10 @@
 "use client";
+import AddMemberToProjectForm from "@/components/pages/projects/ui/addMemberToProjectForm/AddMemberToProjectForm";
+import CreateTaskForm from "@/components/pages/projects/ui/createTaskForm/CreateTaskForm";
+import DeleteProjectConfirmation from "@/components/pages/projects/ui/deleteProjectForm/DeleteProjectConfirmation";
+import EditProjectForm from "@/components/pages/projects/ui/editProjectForm/EditProjectForm";
+import RemoveMemberConfirmation from "@/components/pages/projects/ui/removeMemberForm/RemoveMemberConfirmation";
+import { useModal } from "@/stores/modal.store";
 import { Project } from "@/types/interfaces/interfaces";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -12,6 +18,7 @@ import {
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { RefObject } from "react";
+import { toast } from "sonner";
 
 const ProjectCardHeader = ({
   project,
@@ -29,28 +36,70 @@ const ProjectCardHeader = ({
   menuRef: RefObject<HTMLDivElement | null>;
 }) => {
   const pathname = usePathname();
+  const { openModal } = useModal();
 
   const handleEdit = () => {
     setIsMenuOpen(false);
-    console.log("Edit project:", project.id);
+    openModal(
+      <EditProjectForm
+        projectName={project.name}
+        projectDescription={project.description}
+        projectId={project.id}
+      />,
+      "Edit Project"
+    );
   };
 
   const handleDelete = () => {
     setIsMenuOpen(false);
-    console.log("Delete project:", project.id);
+    openModal(
+      <DeleteProjectConfirmation
+        projectName={project.name}
+        projectId={project.id}
+      />,
+      "Delete Confirmation"
+    );
   };
 
   const handleAddMember = () => {
     setIsMenuOpen(false);
-    console.log("Add member to project:", project.id);
+    openModal(
+      <AddMemberToProjectForm
+        projectId={project.id}
+        projectName={project.name}
+        projectOwnerName={project.owner.name}
+      />,
+      "Add Member To The Project"
+    );
   };
   const handleAddTask = () => {
     setIsMenuOpen(false);
-    console.log("Add task to project:", project.id);
+    openModal(
+      <CreateTaskForm
+        projectId={project.id}
+        projectMembers={project.members}
+      />,
+      "Create Task Form"
+    );
   };
   const handleRemoveMember = () => {
     setIsMenuOpen(false);
-    console.log("Add task to project:", project.id);
+    if (
+      project.members.filter(
+        (member) => member.user.name !== project.owner.name
+      ).length > 0
+    ){
+      openModal(
+        <RemoveMemberConfirmation
+          projectId={project.id}
+          projectMembers={project.members}
+          projectOwnerName={project.owner.name}
+        />,
+        "Remove Member From Project"
+      );
+    }else {
+      toast.warning('Add project member first !')
+    }
   };
 
   return (
@@ -73,7 +122,7 @@ const ProjectCardHeader = ({
         </div>
       </div>
 
-      {pathname.includes("projects/") && project.ownerId === currentUserId && (
+      {pathname.includes("projects") && project.ownerId === currentUserId && (
         <div className="relative" ref={menuRef}>
           <motion.button
             whileHover={{ scale: 1.1, rotate: 90 }}
