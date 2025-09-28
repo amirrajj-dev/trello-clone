@@ -6,7 +6,7 @@ import { CreateTaskDto } from "@/utils/dtos";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-export const useCreateTask = () => {
+export const useCreateTask = (projectId: string) => {
   const { closeModal } = useModal();
   const queryClient = useQueryClient();
   return useMutation({
@@ -16,6 +16,7 @@ export const useCreateTask = () => {
       toast.success("Task created Succesfully");
       queryClient.invalidateQueries({ queryKey: ["user-projects"] });
       queryClient.invalidateQueries({ queryKey: ["user-tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
       closeModal();
     },
     onError: (err) => toast.error(err.message || "Failed to create task"),
