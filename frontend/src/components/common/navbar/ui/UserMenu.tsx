@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -8,22 +8,26 @@ import Link from "next/link";
 import { deleteCookie } from "@/helpers/delete-cookie";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 const UserMenu = () => {
-    const router = useRouter()
+  const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { data: user, isLoading } = useGetMe();
   const menuItems = [{ icon: User, label: "Profile", href: "/profile" }];
+  const queryClient = useQueryClient();
   const handleLogout = async () => {
     await deleteCookie();
     toast.success("Logged out successfully!");
+    queryClient.removeQueries({queryKey : ['user']})
+    queryClient.removeQueries({queryKey : ['me']})
+    queryClient.removeQueries({queryKey : ['user-projects']})
+    queryClient.removeQueries({queryKey : ['user-tasks']})
     router.push("/signin");
   };
 
-  if (isLoading){
-    return (
-      <div className="loading loading-spinner"></div>
-    )
+  if (isLoading) {
+    return <div className="loading loading-spinner"></div>;
   }
 
   return (
