@@ -14,6 +14,7 @@ import {
 } from "./dtos";
 import { ApiResponse } from "@/types/api/api.response";
 import {
+  Comment,
   Project,
   ProjectMember,
   ProjectWithDetails,
