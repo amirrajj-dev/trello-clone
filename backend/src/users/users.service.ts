@@ -225,6 +225,12 @@ export class UsersService {
             id: true,
             name: true,
             ownerId: true,
+            members: {
+              select: {
+                userId: true,
+                role: true,
+              },
+            },
           },
         },
       },

@@ -101,6 +101,11 @@ export class ProjectsService {
         createdAt: true,
         updatedAt: true,
         ownerId: true,
+        owner: {
+          select: {
+            name: true,
+          },
+        },
         members: {
           select: {
             userId: true,
@@ -108,6 +113,8 @@ export class ProjectsService {
               select: {
                 name: true,
                 avatarUrl: true,
+                id: true,
+                email: true,
               },
             },
             role: true,
@@ -302,6 +309,15 @@ export class ProjectsService {
       throw new ForbiddenException(
         'The User Your Trying To Delete is the Owner Of The Project',
       );
+    }
+    const userTasks = await this.prismaService.task.findMany({
+      where: {
+        projectId,
+        assigneeId: userId,
+      },
+    });
+    if (userTasks.length > 0) {
+      throw new ForbiddenException('User Has Tasks');
     }
     await this.prismaService.projectMember.delete({
       where: {

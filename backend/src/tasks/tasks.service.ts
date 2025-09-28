@@ -16,7 +16,6 @@ import { TaskDeleteResponse } from './types/task-delete.interface';
 import { TASKSTATUS } from 'src/common/enums/task-status.enum';
 import { NotificationOptions } from 'src/common/enums/notification.enum';
 import { EventsService } from 'src/events/events.service';
-import { TaskStatus } from '@prisma/client';
 
 @Injectable()
 export class TasksService {
@@ -72,6 +71,46 @@ export class TasksService {
     const tasks = await this.prismaService.task.findMany({
       where: {
         projectId,
+      },
+      select: {
+        id: true,
+        _count: {
+          select: { comments: true },
+        },
+        assignee: {
+          select: {
+            name: true,
+            avatarUrl: true,
+            email: true,
+          },
+        },
+        assigneeId: true,
+        createdAt: true,
+        description: true,
+        dueDate: true,
+        Notification: true,
+        priority: true,
+        progress: true,
+        project: {
+          select: {
+            name: true,
+            members: {
+              select: {
+                role: true,
+                userId: true,
+                user: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        projectId: true,
+        status: true,
+        title: true,
+        updatedAt: true,
       },
     });
     this.logger.log('Tasks fetched successfully');
@@ -251,12 +290,6 @@ export class TasksService {
     if (!projectMember) {
       throw new ForbiddenException('You are not a member of this project');
     }
-    await this.prismaService.task.delete({
-      where: {
-        id: taskId,
-      },
-    });
-    this.logger.log(`Task ${taskId} Deleted Successfully`);
     if (task.assigneeId) {
       await this.notificationsService.sendNotification(
         task.assigneeId,
@@ -265,7 +298,6 @@ export class TasksService {
         { taskId: task.id, projectId: task.projectId },
       );
     }
-
     // Notify project owner
     const project = await this.prismaService.project.findUnique({
       where: { id: task.projectId },
@@ -280,6 +312,12 @@ export class TasksService {
         { taskId: task.id, projectId: task.projectId },
       );
     }
+    await this.prismaService.task.delete({
+      where: {
+        id: taskId,
+      },
+    });
+    this.logger.log(`Task ${taskId} Deleted Successfully`);
 
     return {
       message: 'Task deleted successfully',
