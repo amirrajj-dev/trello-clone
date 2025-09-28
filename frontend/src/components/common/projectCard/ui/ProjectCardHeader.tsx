@@ -5,6 +5,7 @@ import DeleteProjectConfirmation from "@/components/pages/projects/ui/deleteProj
 import EditProjectForm from "@/components/pages/projects/ui/editProjectForm/EditProjectForm";
 import RemoveMemberConfirmation from "@/components/pages/projects/ui/removeMemberForm/RemoveMemberConfirmation";
 import { useModal } from "@/stores/modal.store";
+import { Role } from "@/types/enums/enums";
 import { Project } from "@/types/interfaces/interfaces";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -67,7 +68,7 @@ const ProjectCardHeader = ({
       <AddMemberToProjectForm
         projectId={project.id}
         projectName={project.name}
-        projectOwnerName={project.owner.name}
+        projectMembers={project.members.map((member) => member.user.name)}
       />,
       "Add Member To The Project"
     );
@@ -88,7 +89,7 @@ const ProjectCardHeader = ({
       project.members.filter(
         (member) => member.user.name !== project.owner.name
       ).length > 0
-    ){
+    ) {
       openModal(
         <RemoveMemberConfirmation
           projectId={project.id}
@@ -97,10 +98,20 @@ const ProjectCardHeader = ({
         />,
         "Remove Member From Project"
       );
-    }else {
-      toast.warning('Add project member first !')
+    } else {
+      toast.warning("Add project member first !");
     }
   };
+
+  const ownerMember = project.members.find(
+    (member) => member.role === Role.OWNER
+  );
+  const adminMembers = project.members.filter(
+    (member) => member.role === Role.ADMIN
+  );
+  const nonViewerMembers = project.members.filter(
+    (member) => member.role !== Role.VIEWER
+  );
 
   return (
     <div className="flex items-start justify-between mb-4 relative z-10">
@@ -122,76 +133,92 @@ const ProjectCardHeader = ({
         </div>
       </div>
 
-      {pathname.includes("projects") && project.ownerId === currentUserId && (
-        <div className="relative" ref={menuRef}>
-          <motion.button
-            whileHover={{ scale: 1.1, rotate: 90 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 text-base-content/40 hover:text-base-content hover:bg-base-content/10 rounded-xl transition-colors"
-          >
-            <MoreHorizontal size={16} />
-          </motion.button>
+      {(pathname.includes("projects") &&
+        nonViewerMembers.some((member) => member.user.id === currentUserId)) && (
+          <div className="relative" ref={menuRef}>
+            <motion.button
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 text-base-content/40 hover:text-base-content hover:bg-base-content/10 rounded-xl transition-colors"
+            >
+              <MoreHorizontal size={16} />
+            </motion.button>
 
-          <AnimatePresence>
-            {isMenuOpen && (
-              <motion.ul
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                className="absolute right-0 mt-2 w-48 bg-base-100 rounded-xl shadow-xl border border-base-300 z-50 overflow-hidden"
-              >
-                <li>
-                  <button
-                    onClick={handleEdit}
-                    className="flex items-center cursor-pointer gap-3 w-full px-4 py-3 text-base-content hover:bg-base-300 transition-colors"
-                  >
-                    <Edit size={16} className="text-info" />
-                    <span>Edit Project</span>
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={handleRemoveMember}
-                    className="flex items-center cursor-pointer gap-3 w-full px-4 py-3 text-base-content hover:bg-base-300 transition-colors"
-                  >
-                    <UserMinus size={16} className="text-warning" />
-                    <span>Remove Member</span>
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={handleAddMember}
-                    className="flex items-center cursor-pointer gap-3 w-full px-4 py-3 text-base-content hover:bg-base-300 transition-colors"
-                  >
-                    <UserPlus size={16} className="text-success" />
-                    <span>Add Member</span>
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={handleAddTask}
-                    className="flex items-center cursor-pointer gap-3 w-full px-4 py-3 text-base-content hover:bg-base-300 transition-colors"
-                  >
-                    <ListCheck size={16} className="text-accent" />
-                    <span>Add Task</span>
-                  </button>
-                </li>
-                <li className="border-t border-base-300">
-                  <button
-                    onClick={handleDelete}
-                    className="flex items-center cursor-pointer gap-3 w-full px-4 py-3 text-error hover:bg-error/10 transition-colors"
-                  >
-                    <Trash2 size={16} />
-                    <span>Delete Project</span>
-                  </button>
-                </li>
-              </motion.ul>
-            )}
-          </AnimatePresence>
-        </div>
-      )}
+            <AnimatePresence>
+              {isMenuOpen && (
+                <motion.ul
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-2 w-48 bg-base-100 rounded-xl shadow-xl border border-base-300 z-50 overflow-hidden"
+                >
+                  {ownerMember?.user.id === currentUserId && (
+                    <li>
+                      <button
+                        onClick={handleEdit}
+                        className="flex items-center cursor-pointer gap-3 w-full px-4 py-3 text-base-content hover:bg-base-300 transition-colors"
+                      >
+                        <Edit size={16} className="text-info" />
+                        <span>Edit Project</span>
+                      </button>
+                    </li>
+                  )}
+                  {(ownerMember?.user.id === currentUserId ||
+                    adminMembers.some(
+                      (member) => member.user.id === currentUserId
+                    )) && (
+                    <li>
+                      <button
+                        onClick={handleAddMember}
+                        className="flex items-center cursor-pointer gap-3 w-full px-4 py-3 text-base-content hover:bg-base-300 transition-colors"
+                      >
+                        <UserPlus size={16} className="text-success" />
+                        <span>Add Member</span>
+                      </button>
+                    </li>
+                  )}
+                  {ownerMember?.user.id === currentUserId && (
+                    <li>
+                      <button
+                        onClick={handleRemoveMember}
+                        className="flex items-center cursor-pointer gap-3 w-full px-4 py-3 text-base-content hover:bg-base-300 transition-colors"
+                      >
+                        <UserMinus size={16} className="text-warning" />
+                        <span>Remove Member</span>
+                      </button>
+                    </li>
+                  )}
+                  {nonViewerMembers.some(
+                    (member) => member.user.id === currentUserId
+                  ) && (
+                    <li>
+                      <button
+                        onClick={handleAddTask}
+                        className="flex items-center cursor-pointer gap-3 w-full px-4 py-3 text-base-content hover:bg-base-300 transition-colors"
+                      >
+                        <ListCheck size={16} className="text-accent" />
+                        <span>Add Task</span>
+                      </button>
+                    </li>
+                  )}
+                  {ownerMember?.user.id === currentUserId && (
+                    <li className="border-t border-base-300">
+                      <button
+                        onClick={handleDelete}
+                        className="flex items-center cursor-pointer gap-3 w-full px-4 py-3 text-error hover:bg-error/10 transition-colors"
+                      >
+                        <Trash2 size={16} />
+                        <span>Delete Project</span>
+                      </button>
+                    </li>
+                  )}
+                </motion.ul>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
     </div>
   );
 };

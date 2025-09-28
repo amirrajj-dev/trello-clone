@@ -56,7 +56,7 @@ const ProjectCard = ({
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 rounded-3xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
       <div className="relative bg-base-200 rounded-3xl p-6 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden">
-        {pathname.includes('projects') && project.ownerId === currentUserId &&
+        {pathname.includes('projects') &&
           <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-primary/10 to-transparent rounded-full -translate-y-20 translate-x-20" />
         }
 

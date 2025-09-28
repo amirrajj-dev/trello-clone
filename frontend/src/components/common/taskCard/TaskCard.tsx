@@ -8,7 +8,15 @@ import TaskCardDescription from "./ui/TaskCardDescription";
 import TaskCardMetadata from "./ui/TascCardMetaData";
 import TaskCardProgress from "./ui/TaskCardProgress";
 
-const TaskCard = ({ task, currentUserId }: { task: Task; currentUserId: string }) => {
+const TaskCard = ({
+  task,
+  currentUserId,
+  cardBgColor = "bg-base-200",
+}: {
+  task: Task;
+  currentUserId: string;
+  cardBgColor?: "bg-base-200" | "bg-base-100" | 'bg-base-300';
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -43,7 +51,7 @@ const TaskCard = ({ task, currentUserId }: { task: Task; currentUserId: string }
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <div className="relative bg-base-200 overflow-hidden rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300">
+      <div className={`relative ${cardBgColor} overflow-hidden rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300`}>
         {pathname.includes("/projects/") && (
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-primary/10 to-transparent rounded-full -translate-y-16 translate-x-16" />
         )}
