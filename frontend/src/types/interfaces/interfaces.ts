@@ -20,7 +20,10 @@ export interface Project {
     members: number;
     tasks: number;
   };
-  members: { user: { name: string; avatarUrl: string | null; id: string } , role : Role }[];
+  members: {
+    user: { name: string; avatarUrl: string | null; id: string };
+    role: Role;
+  }[];
   tasks: { progress: number }[];
   owner: {
     name: string;
@@ -37,7 +40,7 @@ export interface ProjectMember {
   role: Role;
   userId: string;
   projectId: string;
-  user: { name: string; avatarUrl: string | null; id: string };
+  user: { name: string; avatarUrl: string | null; id: string; email: string };
 }
 
 export interface Task {
@@ -53,8 +56,13 @@ export interface Task {
   progress: number;
   project: {
     name: string;
-    ownerId: string;
-    id: string;
+    members: {
+      role: Role;
+      userId: string;
+      user : {
+        name : string
+      }
+    }[];
   };
   assigneeId?: string | null;
 }

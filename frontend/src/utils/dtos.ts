@@ -1,4 +1,4 @@
-import { Role } from "@/types/enums/enums";
+import { Priority, Role, TaskStatus } from "@/types/enums/enums";
 
 interface SignUpUserDto {
   email: string;
@@ -40,8 +40,8 @@ interface ChangeMemberRoleDto {
 interface CreateTaskDto {
   title: string;
   description?: string;
-  status?: "TODO" | "IN_PROGRESS" | "DONE";
-  priority?: "LOW" | "MEDIUM" | "HIGH";
+  status?: TaskStatus;
+  priority?: Priority;
   dueDate?: string;
   assigneeId?: string;
 }
@@ -49,8 +49,9 @@ interface CreateTaskDto {
 interface UpdateTaskDto {
   title?: string;
   description?: string;
-  status?: "TODO" | "IN_PROGRESS" | "DONE";
-  priority?: "LOW" | "MEDIUM" | "HIGH";
+  status?: TaskStatus;
+  priority?: Priority;
+  progress? : number; 
   dueDate?: string;
   assigneeId?: string;
 }
