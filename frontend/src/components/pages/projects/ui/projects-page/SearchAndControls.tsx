@@ -31,7 +31,7 @@ const SearchAndControls = ({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/50" />
+       <Search className="absolute z-10 left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-base-content/50" />
         <AnimatePresence>
           {search && (
             <motion.button

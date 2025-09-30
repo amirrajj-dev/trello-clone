@@ -25,7 +25,7 @@ const EditProjectForm = ({
     projectDescription || ""
   );
   const { closeModal } = useModal();
-  const updateProject = useUpdateProject();
+  const updateProject = useUpdateProject(projectId);
 
   const hasChanges =
     name !== originalName || description !== originalDescription;

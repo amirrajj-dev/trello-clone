@@ -27,7 +27,20 @@ const CreateProjectForm = () => {
       return;
     }
 
-    createProject.mutate({ name, description });
+    if (name.trim().length < 4) {
+      toast.error("Project name must be minimum 4 characters long");
+      return;
+    }
+
+    if (name && description.trim()) {
+      if (description.trim().length < 4) {
+        toast.error("Project description must be minimum 4 characters long");
+        return;
+      }
+      createProject.mutate({ name, description });
+    } else {
+      createProject.mutate({ name });
+    }
   };
 
   const isFormValid = name.trim().length > 0;

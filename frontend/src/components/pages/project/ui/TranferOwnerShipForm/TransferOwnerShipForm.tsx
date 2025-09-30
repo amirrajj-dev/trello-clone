@@ -1,4 +1,4 @@
-import { useTransferOwnerShip } from "@/hooks/mutations/transfer-ownership";
+import { useTransferOwnership } from "@/hooks/mutations/transfer-ownership";
 import { useModal } from "@/stores/modal.store";
 import React, { useState } from "react";
 import { toast } from "sonner";
@@ -27,7 +27,7 @@ const TransferOwnerShipForm = ({
   }>;
   currentUserId: string;
 }) => {
-  const transferOwnerShip = useTransferOwnerShip(projectId);
+  const transferOwnerShip = useTransferOwnership(projectId);
   const { closeModal } = useModal();
   const [newOwnerId, setNewOwnerId] = useState("");
   const [confirmationText, setConfirmationText] = useState("");

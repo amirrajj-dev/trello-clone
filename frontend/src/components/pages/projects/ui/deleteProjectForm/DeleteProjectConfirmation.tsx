@@ -29,7 +29,7 @@ const DeleteProjectConfirmation = ({
 
   const handleDeleteProject = () => {
     if (isValid) {
-      deleteProject.mutate(projectId);
+      deleteProject.mutate({projectId});
     } else {
       toast.error("Please fill the confirmation fields correctly");
       setAttempts((prev) => prev + 1);
