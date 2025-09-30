@@ -23,8 +23,9 @@ export interface Project {
   members: {
     user: { name: string; avatarUrl: string | null; id: string };
     role: Role;
+    userId : string;
   }[];
-  tasks: { progress: number }[];
+  tasks: { progress: number , id : string }[];
   owner: {
     name: string;
   };
@@ -33,6 +34,8 @@ export interface Project {
 export interface ProjectWithDetails extends Project {
   members: ProjectMember[];
   tasks: (Task & { progress: number })[];
+  projectId? : string;
+  newOwnerId? : string
 }
 
 export interface ProjectMember {
@@ -40,6 +43,7 @@ export interface ProjectMember {
   role: Role;
   userId: string;
   projectId: string;
+  project : {id : string; name : string}
   user: { name: string; avatarUrl: string | null; id: string; email: string };
 }
 
@@ -54,6 +58,11 @@ export interface Task {
   updatedAt: string;
   projectId: string;
   progress: number;
+  assignee? : {
+    name : string;
+    email : string;
+    avatarUrl : string
+  }
   project: {
     name: string;
     members: {
@@ -64,6 +73,8 @@ export interface Task {
       }
     }[];
   };
+  _count : {comments :number}
+  Notification : Notification[]
   assigneeId?: string | null;
 }
 
@@ -90,4 +101,11 @@ export interface Notification {
   commentId?: string | null;
   read: boolean;
   createdAt: string;
+}
+
+export interface MembershipResponse {
+  id: string;
+  project: { id: string; name: string };
+  user: { id: string; name: string; email: string; avatarUrl: string | null };
+  role: Role;
 }
