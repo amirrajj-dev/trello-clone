@@ -1,7 +1,22 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader, MessageSquare, Clock, Trash } from "lucide-react";
+import { Loader, MessageSquare, Clock, Trash, Edit } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useDeleteComment } from "@/hooks/mutations/delete-comment";
+import { Dispatch, SetStateAction, useState } from "react";
+import Image from "next/image";
+
+interface CommentListProps {
+  isLoading: boolean;
+  taskComments: any[] | undefined;
+  currentUser: any;
+  getUserInitials: (name: string) => string;
+  getRandomColor: (userId: string) => string;
+  projectId: string;
+  taskId: string;
+  setNewComment: Dispatch<SetStateAction<string>>
+  setIsInUpdateMode: Dispatch<SetStateAction<boolean>>
+  setCommentToUpdateId: Dispatch<SetStateAction<string | null>>
+}
 
 const CommentList = ({
   isLoading,
@@ -11,19 +26,20 @@ const CommentList = ({
   getRandomColor,
   projectId,
   taskId,
-}: {
-  isLoading: boolean;
-  taskComments: any[] | undefined;
-  currentUser: any;
-  getUserInitials: (name: string) => string;
-  getRandomColor: (userId: string) => string;
-  projectId: string;
-  taskId: string;
-}) => {
+  setNewComment,
+  setIsInUpdateMode,
+  setCommentToUpdateId
+}: CommentListProps) => {
   const deleteComment = useDeleteComment(projectId, taskId);
   const handleDeleteComment = (commentId: string) => {
     deleteComment.mutate({ commentId, projectId });
   };
+  const handleGoToUpdateMode = (content : string , id : string) => {
+    setNewComment(content)
+    setIsInUpdateMode(true)
+    setCommentToUpdateId(id)
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -48,6 +64,7 @@ const CommentList = ({
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 * index }}
+              exit={{ opacity: 0, y: -10, transition: { duration: 0.2 } }}
               className="bg-base-200 rounded-xl p-4 border border-base-300 hover:border-base-content/20 transition-all duration-200"
             >
               <div className="flex items-start gap-3">
@@ -57,14 +74,16 @@ const CommentList = ({
                     comment.userId
                   )} font-semibold text-sm`}
                 >
-                  {comment.user.avatarUrl ? (
-                    <img
+                  {comment?.user?.avatarUrl ? (
+                    <Image
                       src={comment.user.avatarUrl}
                       alt={comment.user.name}
-                      className="w-10 h-10 rounded-full"
+                      width={40}
+                      height={40}
+                      className="rounded-full"
                     />
                   ) : (
-                    getUserInitials(comment.user.name)
+                    getUserInitials(comment?.user?.name)
                   )}
                 </motion.div>
                 <div className="flex items-center justify-between w-full">
@@ -87,7 +106,7 @@ const CommentList = ({
                     </p>
                   </div>
                   {comment.userId === currentUser?.id && (
-                    <div>
+                    <div className="flex items-center justify-center gap-1">
                       <button
                         disabled={deleteComment.isPending}
                         onClick={() => handleDeleteComment(comment.id)}
@@ -106,6 +125,9 @@ const CommentList = ({
                         ) : (
                           <Trash size={16} />
                         )}
+                      </button>
+                      <button onClick={()=>handleGoToUpdateMode(comment.content , comment.id)} className="btn btn-circle btn-soft btn-info">
+                        <Edit size={16} />
                       </button>
                     </div>
                   )}
