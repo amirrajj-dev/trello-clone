@@ -159,6 +159,20 @@ export class CommentsService {
       data: {
         content: updateCommentDto.content,
       },
+      select: {
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        taskId: true,
+        id: true,
+        userId: true,
+        user: {
+          select: {
+            name: true,
+            avatarUrl: true,
+          },
+        },
+      },
     });
     if (comment.userId !== userIdFromReq) {
       await this.notificationsService.sendNotification(

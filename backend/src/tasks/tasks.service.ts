@@ -39,12 +39,20 @@ export class TasksService {
         throw new BadRequestException('Assignee must be a project member');
     }
 
+    const progressValue =
+      task.status === TASKSTATUS.TODO
+        ? 0
+        : task.status === TASKSTATUS.IN_PROGRESS
+          ? 50
+          : 100;
+
     const newTask = await this.prismaService.task.create({
       data: {
         ...task,
         projectId,
         priority: task.priority ?? PRIORITY.MEDIUM,
         status: task.status ?? TASKSTATUS.TODO,
+        progress: progressValue,
       },
     });
 
