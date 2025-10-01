@@ -10,20 +10,21 @@ import UserSelection from "./ui/UserSelection";
 import RoleSelection from "./ui/RoleSelection";
 import FormActions from "./ui/FormActions";
 
+interface addMemberToProjectFormProps {
+  projectId: string;
+  projectName: string;
+  projectMembers: string[];
+}
+
 const AddMemberToProjectForm = ({
   projectId,
   projectName,
-  projectOwnerName,
-}: {
-  projectId: string;
-  projectName: string;
-  projectOwnerName: string;
-}) => {
+  projectMembers,
+}: addMemberToProjectFormProps) => {
   const { data: users, error: usersError } = useGetUsers();
   const [userId, setUserId] = useState("");
   const [role, setRole] = useState<Role | "-1">(Role.MEMBER);
-  const { closeModal } = useModal();
-  const addMemberToProject = useAddMemberToProject();
+  const addMemberToProject = useAddMemberToProject(projectId);
 
   if (usersError) {
     toast.error(usersError.message || "Failed to load users");
@@ -31,17 +32,15 @@ const AddMemberToProjectForm = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!userId || userId === "-1") {
       toast.error("Please select a user");
       return;
     }
-
+    
     if (!role || role === "-1") {
       toast.error("Please select a role");
       return;
     }
-
     addMemberToProject.mutate({ projectId, userId, role });
   };
 
@@ -58,14 +57,13 @@ const AddMemberToProjectForm = ({
         users={users}
         userId={userId}
         setUserId={setUserId}
-        projectOwnerName={projectOwnerName}
+        projectMembers={projectMembers}
       />
       <RoleSelection role={role} setRole={setRole} />
       <FormActions
         addMemberToProject={addMemberToProject}
         userId={userId}
         role={role}
-        closeModal={closeModal}
       />
     </motion.form>
   );

@@ -1,20 +1,22 @@
+import { Role } from "@/types/enums/enums";
 import { User } from "@/types/interfaces/interfaces";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users } from "lucide-react";
+
+interface UserSelectionProps {
+  users: User[] | undefined;
+  userId: string;
+  setUserId: (value: string) => void;
+  projectMembers: string[];
+}
 
 const UserSelection = ({
   users,
   userId,
   setUserId,
-  projectOwnerName,
-}: {
-  users: User[] | undefined;
-  userId: string;
-  setUserId: (value: string) => void;
-  projectOwnerName: string;
-}) => {
+  projectMembers,
+}: UserSelectionProps) => {
   const selectedUser = users?.find((user) => user.id === userId);
-
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -36,8 +38,7 @@ const UserSelection = ({
           Choose a team member...
         </option>
         {users &&
-          users
-            .filter((user) => user.name !== projectOwnerName)
+          users.filter(user=>!projectMembers.includes(user.name))
             .map((user) => (
               <option
                 key={user.id}

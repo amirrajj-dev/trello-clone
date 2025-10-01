@@ -8,6 +8,7 @@ import UserSelection from "./ui/UserSelection";
 import SelectedMemberPreview from "./ui/SelectedMemberPreview";
 import WarningMessage from "./ui/WarningMessage";
 import FormActions from "./ui/FormActions";
+import { Role } from "@/types/enums/enums";
 
 interface RemoveMemberConfirmationProps {
   projectId: string;
@@ -17,17 +18,20 @@ interface RemoveMemberConfirmationProps {
       avatarUrl: string | null;
       id: string;
     };
+    role : Role
   }[];
   projectOwnerName: string;
+  selectedUserId? : string
 }
 
 const RemoveMemberConfirmation = ({
   projectId,
   projectMembers,
   projectOwnerName,
+  selectedUserId
 }: RemoveMemberConfirmationProps) => {
-  const removeMemberFromProject = useRemoveMemberFromProject();
-  const [userId, setUserId] = useState<string>("-1");
+  const removeMemberFromProject = useRemoveMemberFromProject(projectId);
+  const [userId, setUserId] = useState<string>(selectedUserId || "-1");
   const { closeModal } = useModal();
 
   const handleRemoveUserFromProject = () => {
