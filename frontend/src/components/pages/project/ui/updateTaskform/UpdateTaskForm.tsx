@@ -205,7 +205,7 @@ const UpdateTaskForm: React.FC<UpdateTaskFormProps> = ({
     (formData.title.length >= 4 && formData.title.length <= 60);
 
   return (
-    <div className="space-y-6 max-h-[80vh] overflow-y-auto overflow-x-hidden">
+    <form onSubmit={handleSubmit} className="space-y-6 max-h-[80vh] overflow-y-auto overflow-x-hidden">
       <TaskFormHeader />
       <TitleField
         formData={formData}
@@ -242,7 +242,7 @@ const UpdateTaskForm: React.FC<UpdateTaskFormProps> = ({
         isFormValid={isFormValid}
         closeModal={closeModal}
       />
-    </div>
+    </form>
   );
 };
 

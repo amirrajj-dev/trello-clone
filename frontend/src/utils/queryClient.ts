@@ -5,12 +5,12 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-      retry: 1, // Retry failed GET requests once
+      retry: 1,
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes
     },
     mutations: {
-      retry: 2, // Retry failed mutations twice
+      retry: 2,
     },
   },
 });
