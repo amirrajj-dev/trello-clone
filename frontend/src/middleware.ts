@@ -10,11 +10,12 @@ interface JwtPayload {
   exp: number;
 }
 
-const secret = new TextEncoder().encode(ENV.JWT_SECRET);
-
+const secret = new TextEncoder().encode(ENV.JWT_SECRET || process.env.JWT_SECRET);
+console.log(secret);
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get('trello-token')?.value;
   const pathname = request.nextUrl.pathname;
+  console.log('Middleware - Path:', pathname, 'Token exists:', !!token);
 
   // No token: Redirect from protected routes
   if (!token) {
@@ -37,8 +38,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/', request.url));
     }
   } catch (error) {
+    console.log('failed')
     // Invalid token: Redirect to signin and clear cookie
-    console.log(error);
+    console.log('Invalid token on auth page:', error);
     const response = NextResponse.redirect(new URL('/signin', request.url));
     response.cookies.delete('trello-token')
     return response;
