@@ -1,6 +1,6 @@
 "use client";
 import { Project } from "@/types/interfaces/interfaces";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowUpRight, Calendar } from "lucide-react";
 import Link from "next/link";
 

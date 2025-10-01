@@ -1,4 +1,3 @@
-import { Role } from "@/types/enums/enums";
 import { User } from "@/types/interfaces/interfaces";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users } from "lucide-react";

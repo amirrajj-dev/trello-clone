@@ -1,6 +1,5 @@
 import { useAddMemberToProject } from "@/hooks/mutations/add-member-to-project";
 import { useGetUsers } from "@/hooks/queries/users";
-import { useModal } from "@/stores/modal.store";
 import { Role } from "@/types/enums/enums";
 import React, { useState } from "react";
 import { toast } from "sonner";

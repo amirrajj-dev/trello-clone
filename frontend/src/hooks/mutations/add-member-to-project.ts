@@ -202,7 +202,7 @@ export const useAddMemberToProject = (projectId: string) => {
       queryClient.invalidateQueries({ queryKey: ["project", projectId] });
       closeModal();
     },
-    onError: (err, {}, context) => {
+    onError: (err, {}) => {
       toast.error(err.message || `Failed to add user to the project`);
     },
   });

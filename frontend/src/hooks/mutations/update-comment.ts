@@ -16,7 +16,7 @@ export const useUpdateComment = (projectId: string, taskId: string) => {
       comment: UpdateCommentDto;
     }) =>
       commentApi.updateComment(api, data.projectId, data.commentId, data.comment),
-    onMutate: async ({ projectId, commentId, comment }) => {
+    onMutate: async ({ commentId, comment }) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ["comments", taskId] });
 

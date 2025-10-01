@@ -6,12 +6,6 @@ import { toast } from "sonner";
 import { ApiResponse } from "@/types/api/api.response";
 import { Project, ProjectWithDetails, Task } from "@/types/interfaces/interfaces";
 
-interface RemoveMemberResponse {
-  projectId: string;
-  userId: string;
-  message: string;
-}
-
 export const useRemoveMemberFromProject = (projectId: string) => {
   const { closeModal } = useModal();
   const queryClient = useQueryClient();
@@ -86,7 +80,7 @@ export const useRemoveMemberFromProject = (projectId: string) => {
       queryClient.invalidateQueries({ queryKey: ["tasks", projectId] }); // If member was assigned to tasks
       closeModal();
     },
-    onError: (err, { memberId, projectId }, context) => {
+    onError: (err, { projectId }, context) => {
       // Revert caches
       queryClient.setQueryData(["user-projects"], context?.previousProjects);
       queryClient.setQueryData(["project", projectId], context?.previousProject);

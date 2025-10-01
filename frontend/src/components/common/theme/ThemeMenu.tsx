@@ -21,7 +21,7 @@ const ThemeMenu = () => {
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme") || "dark";
     handleThemeChange(storedTheme as "light" | "dark" | "night" | "forest" | "dracula");
-  }, []);
+  }, [handleThemeChange]);
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);

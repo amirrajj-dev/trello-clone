@@ -12,6 +12,6 @@ export default function AuthLayout({
   useEffect(() => {
     const storedTheme = localStorage.getItem('theme') || theme
     document.documentElement.setAttribute("data-theme", storedTheme);
-  }, []);
+  }, [theme]);
   return <div>{children}</div>;
 }

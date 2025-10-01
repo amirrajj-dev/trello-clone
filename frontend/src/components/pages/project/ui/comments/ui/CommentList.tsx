@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Loader, MessageSquare, Clock, Trash, Edit } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { useDeleteComment } from "@/hooks/mutations/delete-comment";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import Image from "next/image";
 
 interface CommentListProps {

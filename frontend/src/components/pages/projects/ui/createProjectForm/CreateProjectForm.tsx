@@ -15,11 +15,6 @@ const CreateProjectForm = () => {
   const [description, setDescription] = useState("");
   const { closeModal } = useModal();
 
-  const resetForm = () => {
-    setName("");
-    setDescription("");
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {

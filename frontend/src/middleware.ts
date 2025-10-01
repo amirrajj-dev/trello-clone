@@ -39,6 +39,7 @@ export async function middleware(request: NextRequest) {
     }
   } catch (error) {
     // Invalid token: Redirect to signin and clear cookie
+    console.log(error);
     const response = NextResponse.redirect(new URL('/signin', request.url));
     await deleteCookie();
     return response;

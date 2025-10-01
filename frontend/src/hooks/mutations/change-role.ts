@@ -78,7 +78,7 @@ export const useChangeRole = (projectId: string) => {
       queryClient.invalidateQueries({ queryKey: ["tasks", projectId] });
       closeModal();
     },
-    onError: (err, { userId, role, projectId }, context) => {
+    onError: (err, { userId, projectId }, context) => {
       // Revert caches
       queryClient.setQueryData(["user-projects"], context?.previousProjects);
       queryClient.setQueryData(["project", projectId], context?.previousProject);

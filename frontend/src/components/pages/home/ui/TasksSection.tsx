@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { getUserTasks } from "@/hooks/queries/tasks";
+import { useGetUserTasks } from "@/hooks/queries/tasks";
 import { List } from "lucide-react";
 import TaskCard from "@/components/common/taskCard/TaskCard";
 import { Task } from "@/types/interfaces/interfaces";
@@ -12,7 +12,7 @@ const TasksSection = () => {
     data: tasksData,
     isLoading: tasksLoading,
     error: tasksError,
-  } = getUserTasks();
+  } = useGetUserTasks();
   const tasks = tasksData?.data;
   if (tasksError) {
     toast.error(tasksError.message || "Failed to load tasks");

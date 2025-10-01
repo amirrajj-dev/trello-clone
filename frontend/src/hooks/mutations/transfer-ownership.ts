@@ -117,7 +117,7 @@ export const useTransferOwnership = (projectId: string) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       closeModal();
     },
-    onError: (err, { projectId, newOwnerId }, context) => {
+    onError: (err, { projectId }, context) => {
       queryClient.setQueryData(["user-projects"], context?.previousProjects);
       queryClient.setQueryData(
         ["project", projectId],

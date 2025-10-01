@@ -1,4 +1,4 @@
-import { commentApi, projectApi } from "@/utils/api";
+import { commentApi } from "@/utils/api";
 import api from "@/utils/axios";
 import { useQuery } from "@tanstack/react-query";
 

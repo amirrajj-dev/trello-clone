@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { UserPlus, Loader } from "lucide-react";
-import { UseMutateFunction, UseMutationResult } from "@tanstack/react-query";
+import { UseMutationResult } from "@tanstack/react-query";
 import { ApiResponse } from "@/types/api/api.response";
-import { MembershipResponse, Project, ProjectMember } from "@/types/interfaces/interfaces";
+import { MembershipResponse, Project} from "@/types/interfaces/interfaces";
 import { Role } from "@/types/enums/enums";
 import { useModal } from "@/stores/modal.store";
 

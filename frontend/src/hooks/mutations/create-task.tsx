@@ -14,7 +14,7 @@ const getProgress = (status : TaskStatus)=>{
   return 0
 }
 
-export const useCreateTask = (projectId: string) => {
+export const useCreateTask = () => {
   const { closeModal } = useModal();
   const queryClient = useQueryClient();
 

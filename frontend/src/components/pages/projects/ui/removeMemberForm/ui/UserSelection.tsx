@@ -1,7 +1,6 @@
-import { roleStyles } from "@/data/data";
 import { Role } from "@/types/enums/enums";
 import { motion } from "framer-motion";
-import { Crown, Eye, Shield, User, Users } from "lucide-react";
+import { Users } from "lucide-react";
 
 interface UserSelectionProps {
   userId: string;

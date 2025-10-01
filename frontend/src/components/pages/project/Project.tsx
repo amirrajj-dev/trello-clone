@@ -1,11 +1,11 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useGetMe } from "@/hooks/queries/user";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import { useModal } from "@/stores/modal.store";
 import CreateTaskForm from "@/components/pages/projects/ui/createTaskForm/CreateTaskForm";
-import { ProjectMember, ProjectWithDetails} from "@/types/interfaces/interfaces";
+import { ProjectMember} from "@/types/interfaces/interfaces";
 import { Role } from "@/types/enums/enums";
 import { useGetProject } from "@/hooks/queries/project";
 import { useGetProjectTasks } from "@/hooks/queries/project-tasks";
@@ -26,7 +26,6 @@ const ProjectDetails = () => {
   const params: { id: string } = useParams();
   const { openModal } = useModal();
   const { data: currentUser, refetch: refetchUser } = useGetMe();
-  const [isMenuOpen , setIsMenuOpen] = useState(false)
   const {
     data: projectData,
     isLoading: projectLoading,

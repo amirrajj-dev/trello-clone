@@ -24,7 +24,6 @@ interface TaskCardProps {
 const TaskCard = ({
   task,
   currentUserId,
-  projectId,
   cardBgColor = "bg-base-200",
   canUpdateTask,
   isDragging = false,

@@ -1,4 +1,3 @@
-import { User } from "@/types/interfaces/interfaces";
 import { projectApi } from "@/utils/api";
 import api from "@/utils/axios";
 import { useQuery } from "@tanstack/react-query";

@@ -3,7 +3,7 @@ import { taskApi } from "@/utils/api";
 import api from "@/utils/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Task, Project, ProjectWithDetails, User } from "@/types/interfaces/interfaces";
+import { Task, Project, ProjectWithDetails } from "@/types/interfaces/interfaces";
 import { ApiResponse } from "@/types/api/api.response";
 
 interface DeleteTaskResponse {
@@ -74,7 +74,6 @@ export const useDeleteTask = (projectId: string) => {
       const previousTasks = queryClient.getQueryData<ApiResponse<Task[]>>(["tasks", projectId]);
       const previousProject = queryClient.getQueryData<{ data: ProjectWithDetails }>(["project", projectId]);
       const previousProjects = queryClient.getQueryData<ApiResponse<Project[]>>(["user-projects"]);
-      const currentUser = queryClient.getQueryData<{ data: User }>(["me"])?.data;
 
       return updateCaches(taskId, previousTasks, previousProject, previousProjects);
     },
@@ -89,7 +88,7 @@ export const useDeleteTask = (projectId: string) => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       closeModal();
     },
-    onError: (err, { projectId, taskId }, context) => {
+    onError: (err, { projectId }, context) => {
       queryClient.setQueryData(["tasks", projectId], context?.previousTasks);
       queryClient.setQueryData(["project", projectId], context?.previousProject);
       queryClient.setQueryData(["user-projects"], context?.previousProjects);

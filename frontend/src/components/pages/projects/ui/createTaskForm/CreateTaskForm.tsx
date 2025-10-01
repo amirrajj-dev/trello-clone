@@ -22,7 +22,7 @@ const CreateTaskForm: React.FC<{
   }[];
 }> = ({ projectId, projectMembers }) => {
   const { closeModal } = useModal();
-  const createTaskMutation = useCreateTask(projectId);
+  const createTaskMutation = useCreateTask();
 
   const [formData, setFormData] = useState({
     title: "",

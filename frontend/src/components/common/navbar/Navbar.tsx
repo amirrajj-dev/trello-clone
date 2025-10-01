@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import ThemeMenu from "@/components/common/theme/ThemeMenu";
 import Logo from "@/components/common/logo/Logo";
-import { useGetMe } from "@/hooks/queries/user";
 import UserMenu from "./ui/UserMenu";
 import Notifications from "./ui/Notifications";
 import NotificationsPannel from "./ui/NotificationsPannel";

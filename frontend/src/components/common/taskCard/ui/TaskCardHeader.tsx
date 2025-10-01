@@ -5,13 +5,12 @@ import Link from "next/link";
 import {
   ArrowUpRight,
   MoreHorizontal,
-  MessageSquare,
   TrendingUp,
   Eye,
   Trash2,
   Edit,
 } from "lucide-react";
-import { useState, useRef, RefObject } from "react";
+import { RefObject } from "react";
 import { usePathname } from "next/navigation";
 import { Role } from "@/types/enums/enums";
 import { useModal } from "@/stores/modal.store";

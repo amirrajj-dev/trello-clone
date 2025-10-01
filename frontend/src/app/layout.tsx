@@ -1,5 +1,4 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+// import type { Metadata } from "next";
 import "./globals.css";
 import TanStackQueryProvider from "@/providers/tanstack-provider";
 import { Toaster } from "sonner";
