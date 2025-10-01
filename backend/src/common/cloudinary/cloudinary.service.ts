@@ -116,7 +116,7 @@ export class CloudinaryService {
     try {
       const result = await cloudinary.uploader.destroy(publicId, {
         invalidate: true,
-        resource_type: 'auto',
+        resource_type: 'image',
       });
       this.logger.log(
         `Deleted file from Cloudinary: ${publicId}, result: ${JSON.stringify(result)}`,

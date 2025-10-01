@@ -9,11 +9,13 @@ import { PaginationDto } from './dtos/pagination.dto';
 import { updateUserDto } from './dtos/update-user.dto';
 import { User } from './types/user.interface';
 import { SafeUser } from './types/user-safe.interface';
+import { CloudinaryService } from 'src/common/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prismaService: PrismaService,
+    private readonly cloudinaryService: CloudinaryService,
     private logger: WinstonLogger,
   ) {}
 
@@ -100,6 +102,7 @@ export class UsersService {
             role: true,
           },
         },
+        imagePublicId: true,
       },
     });
 
@@ -191,6 +194,12 @@ export class UsersService {
     if (!user) {
       this.logger.warn(`Delete attempted on non-existent user: ${id}`);
       throw new NotFoundException('User Not Found');
+    }
+    if (user.imagePublicId) {
+      this.logger.log(
+        `Deleting user avatar from Cloudinary: ${user.imagePublicId}`,
+      );
+      await this.cloudinaryService.deleteCloudinaryFile(user.imagePublicId);
     }
     this.logger.log(`Deleting user: ${id}`);
     await this.prismaService.user.delete({

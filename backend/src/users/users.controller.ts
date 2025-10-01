@@ -21,12 +21,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { SafeUser } from './types/user-safe.interface';
+import { WinstonLogger } from 'src/common/logger/logger.service';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly cloudinaryService: CloudinaryService,
+    private logger: WinstonLogger,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -71,13 +73,28 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
     @Body() updateUserDto: updateUserDto,
   ): Promise<SafeUser> {
+    const currentUser = await this.usersService.findUserById(id);
+
     let imageData = { publicId: '', url: '' };
+
     if (file) {
+      // If user has an existing avatar, delete it first
+      if (currentUser.imagePublicId) {
+        this.logger.log(
+          `Deleting old avatar for user ${id}: ${currentUser.imagePublicId}`,
+        );
+        await this.cloudinaryService.deleteCloudinaryFile(
+          currentUser.imagePublicId,
+        );
+      }
+
+      // Upload the new file
       imageData = await this.cloudinaryService.uploadFile(file);
       if (!imageData.url || !imageData.publicId) {
         throw new Error('File upload failed');
       }
     }
+
     return this.usersService.updateUser(id, {
       ...updateUserDto,
       ...(file && {
