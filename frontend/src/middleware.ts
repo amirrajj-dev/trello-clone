@@ -11,7 +11,7 @@ interface JwtPayload {
 }
 
 const secret = new TextEncoder().encode(ENV.JWT_SECRET || process.env.JWT_SECRET);
-console.log(secret);
+
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get('trello-token')?.value;
   const pathname = request.nextUrl.pathname;
@@ -50,5 +50,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/signin', '/signup', '/projects/:path*'],
+  matcher: ['/', '/signin', '/signup', '/profile' , '/projects/:path*'],
 };
