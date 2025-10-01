@@ -16,8 +16,7 @@ export const useSignup = () => {
       // Set cookie with 1h expiry
       await setCookie(
         access_token,
-        60 * 60,
-        Date.now() + 60 * 60 * 1000
+        60 * 60
       );
         await queryClient.invalidateQueries({ queryKey: ["user", "me"] });
     },

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 import { ENV } from './utils/env';
-import { deleteCookie } from './helpers/delete-cookie';
 
 interface JwtPayload {
   email: string;
@@ -30,7 +29,7 @@ export async function middleware(request: NextRequest) {
     // Expired token
     if (payload.exp < Math.floor(Date.now() / 1000)) {
       const response = NextResponse.redirect(new URL('/signin', request.url));
-      await deleteCookie(); // Await it
+      response.cookies.delete('trello-token')
       return response;
     }
     // Redirect logged-in users from auth pages
@@ -41,7 +40,7 @@ export async function middleware(request: NextRequest) {
     // Invalid token: Redirect to signin and clear cookie
     console.log(error);
     const response = NextResponse.redirect(new URL('/signin', request.url));
-    await deleteCookie();
+    response.cookies.delete('trello-token')
     return response;
   }
 
