@@ -4,13 +4,13 @@ import { format, parseISO } from "date-fns";
 import { useDeleteComment } from "@/hooks/mutations/delete-comment";
 import { Dispatch, SetStateAction } from "react";
 import Image from "next/image";
+import { getRandomColor } from "@/helpers/get-random-color";
 
 interface CommentListProps {
   isLoading: boolean;
   taskComments: any[] | undefined;
   currentUser: any;
   getUserInitials: (name: string) => string;
-  getRandomColor: (userId: string) => string;
   projectId: string;
   taskId: string;
   setNewComment: Dispatch<SetStateAction<string>>
@@ -23,7 +23,6 @@ const CommentList = ({
   taskComments,
   currentUser,
   getUserInitials,
-  getRandomColor,
   projectId,
   taskId,
   setNewComment,
