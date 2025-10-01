@@ -98,7 +98,7 @@ const ProfileHeader = ({
             )}
           </div>
         </div>
-        <div className="flex flex-col sm:flex-row lg:flex-col gap-3">
+        <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full sm:w-auto">
           <motion.button
             onClick={handleEditProfile}
             whileHover={{ scale: 1.05, y: -2 }}
