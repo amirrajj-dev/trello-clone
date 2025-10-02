@@ -1,9 +1,15 @@
-// import type { Metadata } from "next";
 import "./globals.css";
 import TanStackQueryProvider from "@/providers/tanstack-provider";
 import { Toaster } from "sonner";
 import Modal from "@/components/modal/Modal";
 import { SocketProvider } from "@/contexts/socket-context";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  icons : {
+    icon : "/trello.ico",
+  }
+}
 
 export default function RootLayout({
   children,
