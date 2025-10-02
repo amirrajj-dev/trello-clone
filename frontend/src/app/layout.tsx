@@ -3,6 +3,7 @@ import "./globals.css";
 import TanStackQueryProvider from "@/providers/tanstack-provider";
 import { Toaster } from "sonner";
 import Modal from "@/components/modal/Modal";
+import { SocketProvider } from "@/contexts/socket-context";
 
 export default function RootLayout({
   children,
@@ -11,13 +12,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`antialiased`}
-      >
-        <TanStackQueryProvider>{children}
-        <Modal/>
+      <body className={`antialiased`}>
+        <TanStackQueryProvider>
+          <SocketProvider>{children}</SocketProvider>
+          <Modal />
         </TanStackQueryProvider>
-        <Toaster/>
+        <Toaster />
       </body>
     </html>
   );
