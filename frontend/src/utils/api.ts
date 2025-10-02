@@ -15,6 +15,7 @@ import {
 import { ApiResponse } from "@/types/api/api.response";
 import {
   Comment,
+  Notification,
   Project,
   ProjectMember,
   ProjectWithDetails,
@@ -180,14 +181,12 @@ const commentApi = {
 
 // Notification API
 const notificationApi = {
-  getNotifications: (api: AxiosInstance) =>
-    api
-      .get<ApiResponse<Notification[]>>("/notifications")
-      .then((res) => res.data),
-  deleteReadNotifications: (api: AxiosInstance) =>
-    api
-      .delete<ApiResponse<{ message: string }>>("/notifications/delete-read")
-      .then((res) => res.data),
+  getUserNotifications: (api: AxiosInstance, userId: string) =>
+    api.get<ApiResponse<Notification[]>>(`/notifications?userId=${userId}`).then((res) => res.data),
+  markAsRead: async (api: AxiosInstance, notificationId: string) =>
+    api.put(`/notifications/${notificationId}/read`).then((res) => res.data),
+  deleteReadNotifications: async (api: AxiosInstance) =>
+    api.delete('/notifications/delete-read').then((res) => res.data),
 };
 
 export { authApi, userApi, projectApi, taskApi, commentApi, notificationApi };
