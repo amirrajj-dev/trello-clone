@@ -47,25 +47,23 @@ A modern, feature-rich project management application inspired by Trello, built 
 
 ## Tech Stack
 
+<div align="left">
+
 ### Frontend
-<img src="https://skillicons.dev/icons?i=nextjs" alt="NextJs" height="40" />
-<img src="https://skillicons.dev/icons?i=react" alt="React" height="40" />
-<img src="https://skillicons.dev/icons?i=ts" alt="Ts" height="40" />
-<img src="https://skillicons.dev/icons?i=tailwind" alt="Tailwind" height="40" />
+<img src="https://skillicons.dev/icons?i=nextjs,react,ts,tailwind" alt="Frontend Technologies" height="40" />
 <img src="./frontend/public/techs/daisyui.png" alt="DaisyUi" height="40" />
 <img src="./frontend/public/techs/framer-motion.svg" alt="Framer Motion" height="40" />
 <img src="./frontend/public/techs/react-query.png" alt="React Query" height="40" />
 <img src="./frontend/public/techs/zustand.svg" alt="Zustand" height="40" />
 <img src="./frontend/public/techs/socket.io.svg" alt="Socket.io" height="40" />
 
-### Backend
-<img src="https://skillicons.dev/icons?i=nestjs" alt="NestJs" height="40" />
-<img src="https://skillicons.dev/icons?i=nodejs" alt="NodeJs" height="40" />
-<img src="https://skillicons.dev/icons?i=prisma" alt="Prisma" height="40" />
+### Backend  
+<img src="https://skillicons.dev/icons?i=nestjs,nodejs,prisma" alt="Backend Technologies" height="40" />
 <img src="./frontend/public/techs/socket.io.svg" alt="Socket.io" height="40" />
 
 ### Database
 <img src="https://skillicons.dev/icons?i=postgres" alt="Postgres" height="40" />
+</div>
 
 ## Clone Repo
 
