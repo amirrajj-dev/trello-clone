@@ -41,13 +41,7 @@ export const useNotificationEvents = (userId: string) => {
         return;
       }
       markNotificationAsShown(notification.id)
-      toast.info(notification.message, {
-        duration: 4000,
-        action: {
-          label: "Mark as read",
-          onClick: () => {},
-        },
-      });
+      toast.info(notification.message);
     }
   }, [queryClient, userId, invalidateQueriesByNotificationType , hasNotificationBeenShown , markNotificationAsShown]);
 
