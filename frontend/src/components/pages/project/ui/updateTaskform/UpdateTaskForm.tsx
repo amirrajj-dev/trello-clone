@@ -141,15 +141,19 @@ const UpdateTaskForm: React.FC<UpdateTaskFormProps> = ({
     const updatedFields: UpdateTaskDto = {};
 
     if (formData.title !== task.title) updatedFields.title = formData.title;
-    if (formData.description !== task.description)
+    if (formData.description){
+      if (formData.description !== task.description)
       updatedFields.description = formData.description;
+    }
     if (formData.priority !== task.priority)
       updatedFields.priority = formData.priority;
     if (formData.status !== task.status) updatedFields.status = formData.status;
-    if (new Date(formData.dueDate as string)?.toISOString() !== task.dueDate)
+    if (formData.dueDate){
+      if (new Date(formData.dueDate as string)?.toISOString() !== task.dueDate)
       updatedFields.dueDate = new Date(
         formData.dueDate as string
       ).toISOString();
+    }
     if (formData.assigneeId !== task.assigneeId)
       updatedFields.assigneeId = formData.assigneeId;
 
