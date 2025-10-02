@@ -254,18 +254,6 @@ export class TasksService {
       });
     }
 
-    if (updates.status && updatedTask.assigneeId) {
-      notifications.push({
-        userId: updatedTask.assigneeId,
-        payload: {
-          type: NotificationOptions.TASK_STATUS_CHANGED,
-          taskId: updatedTask.id,
-          projectId: task.projectId,
-          message: `Task "${updatedTask.title}" status changed to ${updates.status}.`,
-        },
-      });
-    }
-
     if (updatedTask.assigneeId && updates.progress !== undefined) {
       const { data: project } = await this.projectsService.getProject(
         updatedTask.projectId,
