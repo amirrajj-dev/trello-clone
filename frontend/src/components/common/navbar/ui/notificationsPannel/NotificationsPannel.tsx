@@ -30,7 +30,7 @@ const NotificationsPanel = ({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.95 }}
           transition={{ duration: 0.2, type: "spring" }}
-          className="absolute top-16 right-0 md:right-8 mt-2 w-full md:w-96 max-h-[480px] bg-base-100/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-base-300/50 z-50 overflow-hidden"
+          className="absolute top-16 right-0 md:right-8 mt-2 w-full md:w-96 max-h-[480px] bg-base-100/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-base-300/50 z-50 overflow-hidden flex flex-col"
         >
           <NotificationsHeader
             unreadCount={unreadNotifications.length}
@@ -41,12 +41,16 @@ const NotificationsPanel = ({
             isLoading={isLoading}
             setShowNotifications={setShowNotifications}
           />
-          <NotificationsList
-            notifications={displayedNotifications}
-            isLoading={isLoading}
-            showRead={showRead}
-            markAsRead={markAsRead}
-          />
+          
+          <div className="flex-1 overflow-hidden">
+            <NotificationsList
+              notifications={displayedNotifications}
+              isLoading={isLoading}
+              showRead={showRead}
+              markAsRead={markAsRead}
+            />
+          </div>
+          
           <NotificationsFooter
             unreadNotifications={unreadNotifications}
             readNotifications={readNotifications}
