@@ -1,6 +1,11 @@
-import Profile from '@/components/pages/profile/Profile'
-import React from 'react'
+import Profile from '@/components/pages/profile/Profile';
+import React from 'react';
 
-const page = () =><Profile/>
+export const metadata = {
+  title: 'Profile - Trello Clone',
+  description: 'Manage your Trello Clone profile. Update your account details, view your projects, and customize your experience.'
+};
 
-export default page
+const page = () => <Profile />;
+
+export default page;
