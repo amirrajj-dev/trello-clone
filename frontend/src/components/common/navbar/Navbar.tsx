@@ -6,7 +6,7 @@ import ThemeMenu from "@/components/common/theme/ThemeMenu";
 import Logo from "@/components/common/logo/Logo";
 import UserMenu from "./ui/UserMenu";
 import Notifications from "./ui/Notifications";
-import NotificationsPannel from "./ui/NotificationsPannel";
+import NotificationsPannel from "./ui/notificationsPannel/NotificationsPannel";
 import Link from "next/link";
 
 const Navbar = () => {

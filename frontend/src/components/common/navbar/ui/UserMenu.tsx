@@ -9,11 +9,13 @@ import { deleteCookie } from "@/helpers/delete-cookie";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNotifications } from "@/hooks/notifications";
 
 const UserMenu = () => {
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { data: user, isLoading } = useGetMe();
+  const {isConnected} = useNotifications(user?.id as string || "")
   const menuItems = [{ icon: User, label: "Profile", href: "/profile" }];
   const queryClient = useQueryClient();
   const handleLogout = async () => {
@@ -52,7 +54,7 @@ const UserMenu = () => {
                 height={36}
                 className="rounded-full border-2 border-base-100 shadow-sm"
               />
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-success rounded-full border-2 border-base-100"></div>
+              <div className={`absolute -bottom-1 -right-1 w-3 h-3 ${isConnected ? 'bg-success' : 'bg-error'} rounded-full border-2 border-base-100`}></div>
             </div>
 
             <div className="hidden sm:block text-left">

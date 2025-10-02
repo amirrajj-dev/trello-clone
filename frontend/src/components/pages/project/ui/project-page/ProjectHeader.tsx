@@ -93,7 +93,6 @@ const ProjectHeader = ({
                   className="btn btn-accent rounded-xl gap-2 w-full sm:w-auto"
                 >
                   <UserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="hidden xs:inline">Add Member</span>
                   <span className="xs:hidden">Member</span>
                 </motion.button>
               )}
@@ -102,7 +101,7 @@ const ProjectHeader = ({
             {/* Settings Dropdown */}
             {(project.ownerId === currentUser?.id ||
               adminMembers.some((member) => member.user.id === currentUser?.id)) && (
-              <div className="dropdown dropdown-end z-50 self-end sm:self-auto fixed top-20 right-6 sm:top-auto sm:right-auto sm:relative">
+              <div className="dropdown dropdown-end z-40 self-end sm:self-auto fixed top-20 right-6 sm:top-auto sm:right-auto sm:relative">
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}

@@ -13,7 +13,7 @@ import { validateSync } from 'class-validator';
 import { NotificationDto } from './dtos/notification.dto';
 @WebSocketGateway({
   cors: {
-    origin: process.env.FRONTEND_URLy || 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true,
   },
 })
