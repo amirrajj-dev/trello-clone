@@ -13,7 +13,7 @@ import { validateSync } from 'class-validator';
 import { NotificationDto } from './dtos/notification.dto';
 @WebSocketGateway({
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.FRONTEND_URLy || 'http://localhost:3000',
     credentials: true,
   },
 })
@@ -190,6 +190,61 @@ export class NotificationsGateway
     } catch (error) {
       this.logger.error(
         `❌ Failed to process delete_seen_notifications for user ${payload?.userId}: ${error.message}`,
+        error.stack,
+      );
+    }
+  }
+
+  @OnEvent('notification.read')
+  handleNotificationRead(payload: { userId: string; notificationId: string }) {
+    try {
+      const sockets = this.connectedUsers.get(payload.userId);
+      if (!sockets || sockets.size === 0) return;
+
+      // Emit to all user's sockets that a notification was read
+      sockets.forEach((socketId) => {
+        this.server.to(socketId).emit('notification.read', {
+          notificationId: payload.notificationId,
+        });
+      });
+
+      this.logger.log(
+        `📖 Real-time update: Notification ${payload.notificationId} marked as read`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `❌ Failed to handle notification.read event: ${error.message}`,
+        error.stack,
+      );
+    }
+  }
+
+  // Add this socket event handler for client-side mark as read
+  @SubscribeMessage('mark_notification_read')
+  async handleMarkNotificationRead(
+    client: Socket,
+    payload: { notificationId: string },
+  ) {
+    try {
+      if (!payload?.notificationId) {
+        this.logger.warn(`⚠️ Missing notificationId in mark_read payload`);
+        return;
+      }
+
+      const userId = client.handshake.query.userId as string;
+      if (!userId) return;
+
+      await this.eventEmitter.emitAsync(
+        'notification.ack',
+        payload.notificationId,
+      );
+
+      this.logger.log(
+        `✅ Client requested mark as read for notification ${payload.notificationId}`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `❌ Failed to process mark as read for notification ${payload.notificationId}: ${error.message}`,
         error.stack,
       );
     }

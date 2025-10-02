@@ -30,7 +30,10 @@ export class TasksService {
     projectId: string,
     userId: string,
   ): Promise<Response<Task>> {
-    await this.projectsService.getProject(projectId, userId);
+    const { data: project } = await this.projectsService.getProject(
+      projectId,
+      userId,
+    );
     if (task.assigneeId) {
       const member = await this.prismaService.projectMember.findUnique({
         where: { userId_projectId: { userId: task.assigneeId, projectId } },
@@ -57,13 +60,29 @@ export class TasksService {
     });
 
     this.logger.log(`Task ${newTask.id} Created Successfully`);
-    if (newTask.assigneeId) {
+    if (newTask.assigneeId && newTask.assigneeId !== userId) {
       await this.notificationsService.sendNotification(
         newTask.assigneeId,
         NotificationOptions.TASK_ASSIGNED,
         `You have been assigned a new task: ${newTask.title}`,
         { taskId: newTask.id, projectId },
       );
+    }
+
+    if (project.ownerId && project.ownerId !== userId) {
+      if (!task.assigneeId || task.assigneeId !== project.ownerId) {
+        const user = await this.prismaService.user.findUnique({
+          where: { id: userId },
+          select: { name: true },
+        });
+
+        await this.notificationsService.sendNotification(
+          project.ownerId,
+          NotificationOptions.TASK_ASSIGNED,
+          `${user?.name} created a new task: ${newTask.title}`,
+          { projectId, taskId: newTask.id },
+        );
+      }
     }
 
     return {

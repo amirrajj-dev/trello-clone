@@ -20,7 +20,6 @@ export class EventsService {
 
   @OnEvent('user.connected')
   async handleUserConnected(userId: string) {
-    // Send pending notifications via the same event flow (notification.pending) or directly:
     await this.sendPendingNotifications(userId);
   }
 
@@ -30,7 +29,6 @@ export class EventsService {
     message: string,
     options?: SendNotificationOptions,
   ) {
-    // 1️⃣ Save in DB
     const notification = await this.prismaService.notification.create({
       data: {
         userId,
@@ -43,7 +41,6 @@ export class EventsService {
     });
 
     this.eventEmitter.emit('notification.created', { userId, notification });
-
     return notification;
   }
 
@@ -54,18 +51,34 @@ export class EventsService {
     });
   }
 
-  async markAsRead(notificationId: string) {
-    return this.prismaService.notification.update({
+  async markAsRead(notificationId: string, userId: string) {
+    const notification = await this.prismaService.notification.update({
       where: { id: notificationId },
       data: { read: true },
     });
+
+    // Emit event for real-time update
+    this.eventEmitter.emit('notification.read', {
+      userId,
+      notificationId: notification.id,
+    });
+
+    this.logger.log(`📖 Notification ${notificationId} marked as read for user ${userId}`);
+    return notification;
   }
+
   async sendPendingNotifications(userId: string) {
     try {
       const pendingNotifications = await this.getUserNotifications(userId);
       const unreadNotifications = pendingNotifications.filter((n) => !n.read);
 
-      for (const notification of unreadNotifications) {
+      // Only send recent notifications to avoid duplicates
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      const recentUnread = unreadNotifications.filter(
+        (n) => new Date(n.createdAt) > oneHourAgo
+      );
+
+      for (const notification of recentUnread) {
         this.eventEmitter.emit('notification.pending', {
           userId,
           notification,
@@ -73,7 +86,7 @@ export class EventsService {
       }
 
       this.logger.log(
-        `Sent ${unreadNotifications.length} pending notifications to user ${userId}`,
+        `Sent ${recentUnread.length} pending notifications to user ${userId}`,
       );
       return true;
     } catch (error) {
@@ -87,29 +100,33 @@ export class EventsService {
   @OnEvent('notification.ack')
   async handleNotificationAck(notificationId: string) {
     try {
-      await this.markAsRead(notificationId);
-      this.logger.log(`📖 Notification ${notificationId} marked as read`);
+      // Find notification to get userId
+      const notification = await this.prismaService.notification.findUnique({
+        where: { id: notificationId },
+      });
+
+      if (notification) {
+        await this.markAsRead(notificationId, notification.userId);
+      }
     } catch (error) {
       this.logger.error(
         `⚠️ Failed to mark notification ${notificationId} as read: ${error.message}`,
       );
     }
   }
+
   @OnEvent('notifications.deleteSeen')
   async handleDeleteSeenNotifications(userId: string) {
     try {
       const result = await this.prismaService.notification.deleteMany({
-        where: {
-          userId,
-          read: true, // delete only read notifications
-        },
+        where: { userId, read: true },
       });
 
       this.logger.log(
         `🗑️ Deleted ${result.count} seen notifications for user ${userId}`,
       );
 
-      return result.count; // 🔹 so gateway can broadcast how many were deleted
+      return result.count;
     } catch (error) {
       this.logger.error(
         `⚠️ Failed to delete seen notifications for user ${userId}: ${error.message}`,
