@@ -4,10 +4,12 @@ import { toast } from "sonner";
 import { Notification } from "@/types/interfaces/interfaces";
 import { ApiResponse } from "@/types/api/api.response";
 import { useNotificationUtils } from "./notificationUtils";
+import { useSocket } from "@/contexts/socket-context";
 
 export const useNotificationEvents = (userId: string) => {
   const queryClient = useQueryClient();
   const { invalidateQueriesByNotificationType } = useNotificationUtils();
+   const { hasNotificationBeenShown, markNotificationAsShown } = useSocket();
 
   const handleNewNotification = useCallback((notification: Notification) => {
     console.log("New notification received:", notification);
@@ -34,6 +36,11 @@ export const useNotificationEvents = (userId: string) => {
 
     // Show toast
     if (!notification.read) {
+       if (hasNotificationBeenShown(notification.id)) {
+        console.log("Notification already shown globally:", notification.id);
+        return;
+      }
+      markNotificationAsShown(notification.id)
       toast.info(notification.message, {
         duration: 4000,
         action: {
@@ -42,7 +49,7 @@ export const useNotificationEvents = (userId: string) => {
         },
       });
     }
-  }, [queryClient, userId, invalidateQueriesByNotificationType]);
+  }, [queryClient, userId, invalidateQueriesByNotificationType , hasNotificationBeenShown , markNotificationAsShown]);
 
   const handleNotificationsDeleted = useCallback(({ count }: { count: number }) => {
     console.log("Notifications deleted via socket:", count);

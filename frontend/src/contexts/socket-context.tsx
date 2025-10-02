@@ -1,11 +1,13 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react';
 import { initializeSocket } from '@/utils/socket';
 import { useGetMe } from '@/hooks/queries/user';
 
 interface SocketContextType {
   isConnected: boolean;
   socket: any | null;
+  hasNotificationBeenShown: (id: string) => boolean;
+  markNotificationAsShown: (id: string) => void;
 }
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -14,6 +16,21 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [socket, setSocket] = useState<any>(null);
   const {data : user} = useGetMe()
+  const shownNotificationIds = useRef(new Set<string>());
+
+  const hasNotificationBeenShown = (id: string) => {
+    return shownNotificationIds.current.has(id);
+  };
+
+  const markNotificationAsShown = (id: string) => {
+    shownNotificationIds.current.add(id);
+    
+    // Clean up old IDs to prevent memory leaks
+    if (shownNotificationIds.current.size > 100) {
+      const firstId = shownNotificationIds.current.values().next().value;
+      shownNotificationIds.current.delete(firstId as string);
+    }
+  };
 
   useEffect(() => {
     if (!user?.id) return;
@@ -53,7 +70,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
   }, [user?.id]);
 
   return (
-    <SocketContext.Provider value={{ isConnected, socket }}>
+    <SocketContext.Provider value={{ isConnected, socket , hasNotificationBeenShown , markNotificationAsShown }}>
       {children}
     </SocketContext.Provider>
   );
